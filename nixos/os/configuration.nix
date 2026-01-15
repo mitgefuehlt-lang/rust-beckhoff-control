@@ -15,7 +15,7 @@ in {
     consoleMode = "max"; # Use the highest available resolution
   };
   boot.loader.efi.canTouchEfiVariables = true;
-  boot.kernelPackages = pkgs.linuxPackages_latest;
+  boot.kernelPackages = pkgs.linuxPackages;
   boot.kernelModules = [ "i915" ];
 
   boot.kernelParams = [
@@ -106,15 +106,11 @@ in {
   ];
 
   networking.hostName = "nixos"; # Define your hostname.
-  # networking.wireless.enable = true; # Enables wireless support via wpa_supplicant.
-
-  networking.interfaces.enp1s0.ipv4.addresses = [
-    {
-      address = "10.10.10.1";
-      prefixLength = 24;
-    }
-  ];
-
+  # networking.wireless.enable = true; # Enables wireless  # networking.interfaces.enp2s0.useDHCP = true;
+  networking.interfaces.enp2s0.ipv4.addresses = [{
+    address = "10.10.10.1";
+    prefixLength = 24;
+  }];
   # Configure network proxy if necessary
   # networking.proxy.default = "http://user:password@proxy:port/";
   # networking.proxy.noProxy = "127.0.0.1,localhost,internal.domain";
@@ -247,6 +243,13 @@ in {
     packages = with pkgs; [ ];
   };
 
+  users.users.konrad = {
+    isNormalUser = true;
+    description = "Konrad";
+    extraGroups = [ "networkmanager" "wheel" "realtime" ];
+    initialPassword = "nixos";
+  };
+
   security.sudo.wheelNeedsPassword = false;
 
   # Enable automatic login for the user.
@@ -334,13 +337,13 @@ in {
   # List services that you want to enable:
 
   # Enable the OpenSSH daemon.
-  # services.openssh.enable = true;
+  services.openssh.enable = true;
 
   services.dnsmasq = {
     enable = true;
 
     settings = {
-      interface = "enp1s0"; # only this interface
+      interface = "enp2s0"; # only this interface
       bind-interfaces = true;
 
       # DHCP subnet + pool

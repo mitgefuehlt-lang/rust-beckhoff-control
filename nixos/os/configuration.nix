@@ -150,7 +150,7 @@ in {
     wayland = true;
   };
 
-  services.xserver.desktopManager.gnome.enable = true;
+  services.desktopManager.gnome.enable = true;
 
   # Disable GNOME lock screen via dconf
   programs.dconf.enable = true;
@@ -183,7 +183,7 @@ in {
 
   # Ensure all power management is disabled
   services.logind = {
-    lidSwitch = "ignore";
+
     settings.Login = {
       HandlePowerKey = "ignore";
       HandleSuspendKey = "ignore";

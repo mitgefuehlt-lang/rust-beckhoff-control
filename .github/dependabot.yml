@@ -1,0 +1,19 @@
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    directory: "/electron"
+    schedule:
+      interval: "monthly"
+    ignore:
+    - dependency-name: "*"
+      update-types:
+        - "version-update:semver-minor"
+
+  - package-ecosystem: "cargo"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    ignore:
+      - dependency-name: "*"
+        update-types:
+          - "version-update:semver-minor"

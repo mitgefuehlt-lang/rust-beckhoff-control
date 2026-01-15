@@ -1,0 +1,32 @@
+name: Deploy to NixOS Mini PC
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+    # Only allow one deployment at a time to avoid lock contention
+    concurrency: production_deploy
+    
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Update Flake Lock
+        # Optional: ensure we are using fresh dependencies if desired, 
+        # but usually we want to deploy exactly what is in the lockfile.
+        # So we skip updating the lockfile here to ensure determinism.
+        run: echo "Using existing flake.lock"
+
+      - name: Build and Switch NixOS
+        run: |
+          echo "Starting NixOS Rebuild..."
+          # We use --flake .#nixos because the hostname in flake.nix is 'nixos'
+          sudo nixos-rebuild switch --flake .#nixos
+          
+      - name: Verify Service Status
+        run: |
+          systemctl is-active qitech.service || echo "Warning: qitech service not active!"

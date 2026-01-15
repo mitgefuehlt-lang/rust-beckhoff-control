@@ -20,11 +20,8 @@ jobs:
         # So we skip updating the lockfile here to ensure determinism.
         run: echo "Using existing flake.lock"
 
-      - name: Build and Switch NixOS
-        run: |
-          echo "Starting NixOS Rebuild..."
-          # We use --flake .#nixos because the hostname in flake.nix is 'nixos'
-          sudo nixos-rebuild switch --flake .#nixos
+      - name: Rebuild NixOS
+        run: /run/current-system/sw/bin/nixos-rebuild switch --flake .
           
       - name: Verify Service Status
         run: |

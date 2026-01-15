@@ -278,8 +278,44 @@ pub async fn setup_loop(
     let device_identifications = read_device_identifications(&subdevices, &maindevice)
         .await
         .into_iter()
+        .zip(&subdevices)
         .enumerate()
-        .map(|(i, result)| (i, result.ok()))
+        .map(|(i, (result, subdevice))| {
+             let mut id_opt = result.ok();
+             
+             // BYPASSS FOR EMPTY EEPROM
+             if id_opt.is_none() {
+                 let name = subdevice.name();
+                 tracing::warn!("Device {} has no ID, applying BYPASS for TestMachine", name);
+                 
+                 // Default Fake ID for TestMachine
+                 let fake_machine_id = machines::machine_identification::MachineIdentification {
+                     vendor: 0x0001, // VENDOR_QITECH
+                     machine: 0x0033, // TEST_MACHINE
+                 };
+                 let fake_unique = machines::machine_identification::MachineIdentificationUnique {
+                     machine_identification: fake_machine_id,
+                     serial: 1,
+                 };
+                 
+                 let role = if name == "EL1008" {
+                     0
+                 } else if name == "EL2008" {
+                     1
+                 } else {
+                     // EK1100 or others
+                     99
+                 };
+
+                 id_opt = Some(machines::machine_identification::DeviceMachineIdentification {
+                     machine_identification_unique: fake_unique,
+                     role: role,
+                 });
+             }
+             // END BYPASS
+
+             (i, id_opt)
+        })
         .map(
             |(subdevice_index, device_machine_identification)| DeviceIdentification {
                 device_machine_identification,

@@ -283,10 +283,16 @@ pub async fn setup_loop(
         .map(|(i, (result, subdevice))| {
              let mut id_opt = result.ok();
              
+             // Check if ID is missing OR if it is just zeros (unprogrammed)
+             let needs_bypass = match &id_opt {
+                 None => true,
+                 Some(id) => id.machine_identification_unique.machine_identification.vendor == 0
+             };
+
              // BYPASSS FOR EMPTY EEPROM
-             if id_opt.is_none() {
+             if needs_bypass {
                  let name = subdevice.name();
-                 tracing::warn!("Device {} has no ID, applying BYPASS for TestMachine", name);
+                 tracing::warn!("Device {} has no/zero ID, applying BYPASS for TestMachine", name);
                  
                  // Default Fake ID for TestMachine
                  let fake_machine_id = machines::machine_identification::MachineIdentification {

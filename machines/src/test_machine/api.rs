@@ -12,7 +12,7 @@ use std::sync::Arc;
 
 #[derive(Serialize, Debug, Clone)]
 pub struct StateEvent {
-    pub led_on: [bool; 4],
+    pub led_on: [bool; 8],
 }
 
 impl StateEvent {

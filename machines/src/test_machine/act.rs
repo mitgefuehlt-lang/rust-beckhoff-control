@@ -11,7 +11,7 @@ impl MachineAct for TestMachine {
         // Logic: Pass through inputs to outputs
         // If Input 1 is TRUE, set Output 1 to TRUE (Lamp on)
         for i in 0..8 {
-            if let Some(val) = self.dins[i].get_value() {
+            if let Ok(val) = self.dins[i].get_value() {
                 // Only update if changed or force update? 
                 // Just setting it every cycle is fine for Logic, the driver handles redundancies usually
                 self.douts[i].set(val);

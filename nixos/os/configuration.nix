@@ -241,6 +241,9 @@ in {
     description = "Kailar HMI";
     extraGroups = [ "networkmanager" "wheel" "realtime" "wireshark" ];
     packages = with pkgs; [ ];
+    openssh.authorizedKeys.keys = [
+      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPK3C7us4fZevULpTNR9UC8t60Qobjs/x9PrqXj1ieWb admin@DESKTOP-JEG0DEL"
+    ];
   };
 
   users.users.konrad = {
@@ -248,6 +251,9 @@ in {
     description = "Konrad";
     extraGroups = [ "networkmanager" "wheel" "realtime" ];
     initialPassword = "nixos";
+    openssh.authorizedKeys.keys = [
+      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPK3C7us4fZevULpTNR9UC8t60Qobjs/x9PrqXj1ieWb admin@DESKTOP-JEG0DEL"
+    ];
   };
 
   security.sudo.wheelNeedsPassword = false;
@@ -266,6 +272,17 @@ in {
   # Enable Wireshark with proper permissions
   programs.wireshark.enable = true;
   programs.wireshark.package = pkgs.wireshark;
+
+  # Default Git Configuration to avoid conflicts
+  programs.git = {
+    enable = true;
+    config = {
+      pull.rebase = true;
+      user.name = "NixOS Operator";
+      user.email = "operator@nixos.local";
+      init.defaultBranch = "main";
+    };
+  };
 
   # List packages installed in system profile. To search, run:
   # $ nix search wget

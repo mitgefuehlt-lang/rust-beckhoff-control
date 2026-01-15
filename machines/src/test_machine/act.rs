@@ -8,6 +8,17 @@ impl MachineAct for TestMachine {
             self.act_machine_message(msg);
         }
 
+        // Logic: Pass through inputs to outputs
+        // If Input 1 is TRUE, set Output 1 to TRUE (Lamp on)
+        for i in 0..8 {
+            if let Some(val) = self.dins[i].get_value() {
+                // Only update if changed or force update? 
+                // Just setting it every cycle is fine for Logic, the driver handles redundancies usually
+                self.douts[i].set(val);
+                self.led_on[i] = val;
+            }
+        }
+
         if now.duration_since(self.last_state_emit) > Duration::from_secs_f64(1.0 / 30.0) {
             self.emit_state();
             self.last_state_emit = now;

@@ -37,9 +37,8 @@ export function SidebarItem({
       className={`relative h-18 w-full ${isActive ? "pl-2" : "px-2"}`}
     >
       <div
-        className={`text-md relative z-10 flex h-full w-full items-center justify-center gap-2 ${
-          isActive ? "rounded-l-lg bg-white pr-2" : "rounded-lg bg-neutral-100"
-        }`}
+        className={`text-md relative z-10 flex h-full w-full items-center justify-center gap-2 ${isActive ? "rounded-l-lg bg-white pr-2" : "rounded-lg bg-neutral-100"
+          }`}
       >
         {icon && <Icon name={icon} />}
         {title}
@@ -150,7 +149,7 @@ export function SidebarLayout() {
     <SidebarlessWidthContext.Provider value={contentWidth}>
       <div className="fixed flex h-full w-48 flex-col bg-neutral-200">
         <div className="flex h-18 flex-col items-center justify-center gap-0 pt-2">
-          <div className="font-qitech line-clamp-none text-3xl">QITECH</div>
+          <div className="font-qitech line-clamp-none text-3xl">KAILAR</div>
         </div>
         <div className="flex flex-col gap-2">
           {items.map((item, index) => (

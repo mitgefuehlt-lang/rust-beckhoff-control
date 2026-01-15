@@ -152,6 +152,21 @@ in {
 
   services.xserver.desktopManager.gnome.enable = true;
 
+  # Disable GNOME lock screen via dconf
+  programs.dconf.enable = true;
+  systemd.user.services.disable-gnome-lock = {
+    description = "Disable GNOME Lock Screen";
+    wantedBy = [ "graphical-session.target" ];
+    script = ''
+      ${pkgs.dconf}/bin/dconf write /org/gnome/desktop/lockdown/disable-lock-screen true
+      ${pkgs.dconf}/bin/dconf write /org/gnome/desktop/screensaver/lock-enabled false
+      ${pkgs.dconf}/bin/dconf write /org/gnome/desktop/session/idle-delay "uint32 0"
+    '';
+    serviceConfig = {
+      Type = "oneshot";
+    };
+  };
+
   # Disable sleep/suspend
   systemd.targets.sleep.enable = false;
   systemd.targets.suspend.enable = false;
@@ -227,7 +242,7 @@ in {
 
   users.users.qitech = {
     isNormalUser = true;
-    description = "QiTech HMI";
+    description = "Kailar HMI";
     extraGroups = [ "networkmanager" "wheel" "realtime" "wireshark" ];
     packages = with pkgs; [ ];
   };

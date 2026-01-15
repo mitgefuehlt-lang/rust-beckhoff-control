@@ -1,7 +1,7 @@
 target/
 dist/
 .DS_Store
-Cargo.lock
+
 dhat-heap.json
 build.sh
 shell.nix

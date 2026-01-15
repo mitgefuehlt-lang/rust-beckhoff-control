@@ -353,6 +353,19 @@ in {
 
   # List services that you want to enable:
 
+  # GitHub Self-Hosted Runner
+  services.github-runners = {
+    nix-runner = {
+      enable = true;
+      name = "nixos-mini-pc";
+      url = "https://github.com/mitgefuehlt-lang/rust-beckhoff-control";
+      tokenFile = "/etc/nixos/github-runner-token";
+      replace = true;
+      user = "root"; # Run as root to allow nixos-rebuild switch
+      extraPackages = with pkgs; [ git nix ];
+    };
+  };
+
   # Enable the OpenSSH daemon.
   services.openssh.enable = true;
 

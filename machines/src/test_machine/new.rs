@@ -10,10 +10,11 @@ use crate::{
 };
 
 use anyhow::Error;
-use ethercat_hal::devices::el2008::{EL2008, EL2008_IDENTITY_A, EL2008Port};
+use ethercat_hal::devices::el2008::{EL2008, EL2008_IDENTITY_A, EL2008_IDENTITY_B, EL2008Port};
 use ethercat_hal::devices::el1008::{EL1008, EL1008_IDENTITY_A, EL1008Port};
 use ethercat_hal::io::digital_output::DigitalOutput;
 use ethercat_hal::io::digital_input::DigitalInput;
+use tracing::info;
 
 //Imports For Wago
 /*
@@ -25,6 +26,8 @@ use std::sync::Arc;
 
 impl MachineNewTrait for TestMachine {
     fn new<'maindevice>(params: &MachineNewParams) -> Result<Self, Error> {
+        info!("[TestMachine::new] Starting initialization...");
+        
         // validate general stuff
         let device_identification = params
             .device_group
@@ -37,40 +40,30 @@ impl MachineNewTrait for TestMachine {
         let hardware = match &params.hardware {
             MachineNewHardware::Ethercat(x) => x,
             _ => {
-                return Err(anyhow::anyhow!(
+                let err = anyhow::anyhow!(
                     "[{}::MachineNewTrait/TestMachine::new] MachineNewHardware is not Ethercat",
                     module_path!()
-                ));
+                );
+                tracing::error!("{}", err);
+                return Err(err);
             }
         };
-        block_on(async {
-            /*
-            // ... Wago commented out code ...
-            */
 
-             // Assuming EL1008 is at index 0 and EL2008 at index 1 is safer, checking get_ethercat_device logic: 
-             // it filters by params.device_group role. But wait, get_ethercat_device takes `subdevice_index` from identification?
-             // Actually `get_ethercat_device` calls `get_device_ident` which gets `subdevice_index` from `device_hardware_identification`.
-             
-             // WE rely on role. The roles must be defined in the Registry or Config? 
-             // Actually `get_ethercat_device` logic:
-             // 1. `get_device_ident(params, role)` retrieves the device info for a specific ROLE.
-             
-             // I don't know the roles assigned to EL1008 and EL2008 in the user's config.
-             // If I use the wrong role, it will fail.
-             // Usually role 0, 1, etc? 
-             
-             // BUT: The existing code used `get_ethercat_device(..., 1, ...)` where 1 is the ROLE? No, 1 is the 3rd argument -> `role`.
-             // Existing code: `get_ethercat_device::<EL2004>(hardware, params, 1, ...)`
-             // So EL2004 was role 1. 
-             // Let's assume EL2008 is role 1.
-             // And EL1008 is role 0? Or 2? 
-             // I'll try getting EL1008 with role 0 and EL2008 with role 1.
-             
-            let el1008 =
-                get_ethercat_device::<EL1008>(hardware, params, 0, [EL1008_IDENTITY_A].to_vec())
-                    .await?
-                    .0;
+        block_on(async {
+            info!("[TestMachine::new] Acquiring EL1008 (Role 0)...");
+            let el1008_res = get_ethercat_device::<EL1008>(hardware, params, 0, [EL1008_IDENTITY_A].to_vec()).await;
+            
+            let el1008 = match el1008_res {
+                Ok(dev) => {
+                    info!("[TestMachine::new] Successfully acquired EL1008");
+                    dev.0
+                },
+                Err(e) => {
+                    tracing::error!("[TestMachine::new] Failed to acquire EL1008: {:?}", e);
+                    return Err(e);
+                }
+            };
+
             let di1 = DigitalInput::new(el1008.clone(), EL1008Port::DI1);
             let di2 = DigitalInput::new(el1008.clone(), EL1008Port::DI2);
             let di3 = DigitalInput::new(el1008.clone(), EL1008Port::DI3);
@@ -80,10 +73,21 @@ impl MachineNewTrait for TestMachine {
             let di7 = DigitalInput::new(el1008.clone(), EL1008Port::DI7);
             let di8 = DigitalInput::new(el1008.clone(), EL1008Port::DI8);
 
-            let el2008 =
-                get_ethercat_device::<EL2008>(hardware, params, 1, [EL2008_IDENTITY_A].to_vec())
-                    .await?
-                    .0;
+            info!("[TestMachine::new] Acquiring EL2008 (Role 1)...");
+            // Allow Identity A and B
+            let el2008_res = get_ethercat_device::<EL2008>(hardware, params, 1, [EL2008_IDENTITY_A, EL2008_IDENTITY_B].to_vec()).await;
+            
+            let el2008 = match el2008_res {
+                Ok(dev) => {
+                    info!("[TestMachine::new] Successfully acquired EL2008");
+                    dev.0
+                },
+                Err(e) => {
+                    tracing::error!("[TestMachine::new] Failed to acquire EL2008: {:?}", e);
+                    return Err(e);
+                }
+            };
+
             let do1 = DigitalOutput::new(el2008.clone(), EL2008Port::DO1);
             let do2 = DigitalOutput::new(el2008.clone(), EL2008Port::DO2);
             let do3 = DigitalOutput::new(el2008.clone(), EL2008Port::DO3);
@@ -92,6 +96,8 @@ impl MachineNewTrait for TestMachine {
             let do6 = DigitalOutput::new(el2008.clone(), EL2008Port::DO6);
             let do7 = DigitalOutput::new(el2008.clone(), EL2008Port::DO7);
             let do8 = DigitalOutput::new(el2008.clone(), EL2008Port::DO8);
+
+            info!("[TestMachine::new] Initialization complete. Creating instance.");
 
             let (sender, receiver) = smol::channel::unbounded();
             let mut my_test = Self {

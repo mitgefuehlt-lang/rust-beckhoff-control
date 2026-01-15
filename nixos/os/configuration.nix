@@ -184,13 +184,13 @@ in {
   # Ensure all power management is disabled
   services.logind = {
     lidSwitch = "ignore";
-    extraConfig = ''
-      HandlePowerKey=ignore
-      HandleSuspendKey=ignore
-      HandleHibernateKey=ignore
-      HandleLidSwitch=ignore
-      IdleAction=ignore
-    '';
+    settings = {
+      HandlePowerKey = "ignore";
+      HandleSuspendKey = "ignore";
+      HandleHibernateKey = "ignore";
+      HandleLidSwitch = "ignore";
+      IdleAction = "ignore";
+    };
   };
 
   # Configure keymap in X11

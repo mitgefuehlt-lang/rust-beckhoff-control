@@ -20,7 +20,7 @@ jobs:
       - uses: actions/checkout@v4
       
       - name: Install Rust
-        uses: dtolnay/rust-action@stable
+        uses: dtolnay/rust-toolchain@stable
         
       - name: Build Server Binary
         run: cargo build --release -p server
@@ -34,9 +34,9 @@ jobs:
           
       - name: Deploy Binary to Mini-PC
         run: |
-          scp -o StrictHostKeyChecking=no target/release/server deploy@mini-pc:~/server-new
-          ssh deploy@mini-pc "sudo systemctl stop qitech-control-server && sudo mv ~/server-new /run/current-system/sw/bin/server && sudo systemctl start qitech-control-server"
+          scp -o StrictHostKeyChecking=no target/release/server konrad@nixos:~/server-new
+          ssh -o StrictHostKeyChecking=no konrad@nixos "sudo systemctl stop qitech-control-server && sudo mv ~/server-new /run/current-system/sw/bin/server && sudo systemctl start qitech-control-server"
           
       - name: Verify Deployment
         run: |
-          ssh deploy@mini-pc "systemctl is-active qitech-control-server"
+          ssh -o StrictHostKeyChecking=no konrad@nixos "systemctl is-active qitech-control-server"

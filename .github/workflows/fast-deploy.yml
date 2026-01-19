@@ -56,8 +56,9 @@ jobs:
           
       - name: Deploy Binary to Mini-PC
         run: |
-          scp -o StrictHostKeyChecking=no target/release/server konrad@nixos:~/server-new
-          ssh -o StrictHostKeyChecking=no konrad@nixos "sudo systemctl stop qitech-control-server && sudo mv ~/server-new /run/current-system/sw/bin/server && sudo systemctl start qitech-control-server"
+          ssh -o StrictHostKeyChecking=no konrad@nixos "sudo mkdir -p /var/lib/qitech && sudo chown konrad /var/lib/qitech"
+          scp -o StrictHostKeyChecking=no target/release/server konrad@nixos:/var/lib/qitech/server
+          ssh -o StrictHostKeyChecking=no konrad@nixos "sudo systemctl restart qitech-control-server"
           
       - name: Verify Deployment
         run: |

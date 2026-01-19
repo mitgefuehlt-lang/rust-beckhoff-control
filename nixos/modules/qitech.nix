@@ -31,6 +31,15 @@ in {
       default = pkgs.qitech-control-server or null;
       description = "The QiTech server package to use";
     };
+
+    fastDeploy = mkOption {
+      type = types.bool;
+      default = false;
+      description = ''
+        Whether to enable fast deployment. If enabled, the service will look for a binary
+        at /var/lib/qitech/server instead of using the Nix store package.
+      '';
+    };
   };
 
   config = mkIf cfg.enable {
@@ -71,7 +80,7 @@ in {
         Type = "simple";
         User = cfg.user;
         Group = cfg.group;
-        ExecStart = "${cfg.package}/bin/server";
+        ExecStart = if cfg.fastDeploy then "/var/lib/qitech/server" else "${cfg.package}/bin/server";
         Restart = "always";
         RestartSec = "10s";
 
@@ -86,7 +95,7 @@ in {
         ProtectSystem = "strict";
 
         # Open only /proc/irq explicitly
-        ReadWritePaths = [ "/proc/irq" ];
+        ReadWritePaths = [ "/proc/irq" "/var/lib/qitech" ];
         ProtectHome = true;
         PrivateTmp = true;
         PrivateDevices = false;

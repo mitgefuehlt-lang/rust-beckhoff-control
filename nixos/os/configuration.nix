@@ -234,6 +234,7 @@ in {
     user = "qitech-service";
     group = "qitech-service";
     package = pkgs.qitechPackages.server;
+    fastDeploy = true;
   };
 
   users.users.qitech = {

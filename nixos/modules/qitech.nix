@@ -80,7 +80,37 @@ in {
         Type = "simple";
         User = cfg.user;
         Group = cfg.group;
-        ExecStart = if cfg.fastDeploy then "/var/lib/qitech/server" else "${cfg.package}/bin/server";
+        # Logging
+        StandardOutput = "journal";
+        StandardError = "journal";
+        SyslogIdentifier = "qitech-control-server";
+
+        ExecStart = let
+          ldPath = lib.makeLibraryPath [
+            pkgs.stdenv.cc.cc.lib
+            pkgs.openssl
+            pkgs.zlib
+            pkgs.libpcap
+            pkgs.udev
+            pkgs.systemd
+            pkgs.glib
+            pkgs.libudev-zero
+            pkgs.libcap
+          ];
+          interpreter = "${pkgs.glibc}/lib/ld-linux-x86-64.so.2";
+          serverBin = "/var/lib/qitech/server";
+          
+          wrapper = pkgs.writeShellScript "qitech-server-wrapper" ''
+            export LD_LIBRARY_PATH=${ldPath}:$LD_LIBRARY_PATH
+            if [ -f ${serverBin} ]; then
+              exec ${interpreter} ${serverBin}
+            else
+              echo "Error: Fast-deploy binary not found at ${serverBin}"
+              exit 1
+            fi
+          '';
+        in if cfg.fastDeploy then "${wrapper}" else "${cfg.package}/bin/server";
+
         Restart = "always";
         RestartSec = "10s";
 
@@ -109,28 +139,10 @@ in {
         LockPersonality = true;
         MemoryDenyWriteExecute = false;
 
-        # Logging
-        StandardOutput = "journal";
-        StandardError = "journal";
-        SyslogIdentifier = "qitech-control-server";
-
         Environment = [
           "RUST_BACKTRACE=full"
           "RUST_LOG=info"
-        ] ++ (lib.optionals cfg.fastDeploy [
-          "NIX_LD_LIBRARY_PATH=${lib.makeLibraryPath [
-            pkgs.stdenv.cc.cc
-            pkgs.openssl
-            pkgs.zlib
-            pkgs.libpcap
-            pkgs.udev
-            pkgs.systemd
-            pkgs.glib
-            pkgs.libudev-zero
-            pkgs.libcap
-          ]}"
-          "NIX_LD=${lib.fileContents "${pkgs.stdenv.cc}/nix-support/dynamic-linker"}"
-        ]);
+        ];
       };
     };
 

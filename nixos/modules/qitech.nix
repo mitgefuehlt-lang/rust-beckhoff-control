@@ -118,7 +118,6 @@ in {
         Environment = [
           "RUST_BACKTRACE=full"
           "RUST_LOG=info"
-        ] ++ (lib.optionals cfg.fastDeploy [
           "LD_LIBRARY_PATH=${lib.makeLibraryPath [
             pkgs.stdenv.cc.cc.lib
             pkgs.openssl
@@ -126,12 +125,11 @@ in {
             pkgs.libpcap
             pkgs.udev
             pkgs.systemd
-            pkgs.systemd.lib
             pkgs.glib
             pkgs.libudev-zero
             pkgs.libcap
           ]}"
-        ]);
+        ];
       };
     };
 

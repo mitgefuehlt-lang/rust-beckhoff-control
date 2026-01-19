@@ -118,7 +118,20 @@ in {
       environment = {
         RUST_BACKTRACE = "full";
         RUST_LOG = "info";
-      };
+      } // (lib.optionalAttrs cfg.fastDeploy {
+        NIX_LD_LIBRARY_PATH = with pkgs; lib.makeLibraryPath [
+          stdenv.cc.cc
+          openssl
+          zlib
+          libpcap
+          udev
+          systemd
+          glib
+          libudev-zero
+          libcap
+        ];
+        NIX_LD = builtins.readFile "${pkgs.stdenv.cc}/nix-support/dynamic-linker";
+      });
     };
 
     # Add real-time privileges

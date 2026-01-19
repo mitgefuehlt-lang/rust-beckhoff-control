@@ -57,21 +57,21 @@ jobs:
           ssh -o StrictHostKeyChecking=no konrad@nixos "sudo systemctl stop qitech-control-server || true; sudo mkdir -p /var/lib/qitech && sudo chown konrad /var/lib/qitech"
           scp -o StrictHostKeyChecking=no -C target/release/server konrad@nixos:/tmp/qitech-server
           ssh -o StrictHostKeyChecking=no konrad@nixos '
-            # Helper to run patchelf even if not in system profile yet
-            RUN_PATCHELF="nix-shell -p patchelf --run patchelf"
-            if command -v patchelf >/dev/null 2>&1; then RUN_PATCHELF="patchelf"; fi
-            
             sudo mv /tmp/qitech-server /var/lib/qitech/server
             sudo chmod +x /var/lib/qitech/server
             sudo chown qitech-service:qitech-service /var/lib/qitech/server
             
-            # Find interpreter dynamically
-            INTERPRETER=$(nix-shell -p patchelf --run "patchelf --print-interpreter $(readlink -f $(which git))")
-            
-            # Use broad RPATH including system profile and standard NixOS locations
+            # Find interpreter dynamically and stable
+            INTERPRETER=$(nix-shell -p patchelf --run "patchelf --print-interpreter /run/current-system/sw/bin/git")
             RPATHS="/run/current-system/sw/lib:/nix/var/nix/profiles/default/lib"
             
-            sudo $RUN_PATCHELF --set-interpreter "$INTERPRETER" --set-rpath "$RPATHS" /var/lib/qitech/server
+            # Run patchelf (Check if available in system profile for speed)
+            if command -v patchelf >/dev/null 2>&1; then
+              sudo patchelf --set-interpreter "$INTERPRETER" --set-rpath "$RPATHS" /var/lib/qitech/server
+            else
+              sudo nix-shell -p patchelf --run "patchelf --set-interpreter $INTERPRETER --set-rpath $RPATHS /var/lib/qitech/server"
+            fi
+            
             sudo systemctl start qitech-control-server
           '
           

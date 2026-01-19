@@ -296,6 +296,9 @@ in {
     openssl
     zlib
     glibc
+    util-linux
+    glib
+    libudev-zero
   ];
 
   # List packages installed in system profile. To search, run:
@@ -314,6 +317,7 @@ in {
     wireshark
     pciutils
     neofetch
+    binutils # for ldd, readelf etc
   ];
 
   xdg.portal.enable = true;

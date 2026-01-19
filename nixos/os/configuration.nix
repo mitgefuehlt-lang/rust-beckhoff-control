@@ -285,6 +285,14 @@ in {
     };
   };
 
+  # Enable nix-ld to run standard Linux binaries (from GitHub Actions)
+  programs.nix-ld.enable = true;
+  programs.nix-ld.libraries = with pkgs; [
+    libpcap
+    systemd
+    stdenv.cc.cc
+  ];
+
   # List packages installed in system profile. To search, run:
   # $ nix search wget
   environment.systemPackages = with pkgs; [

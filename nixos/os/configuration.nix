@@ -320,6 +320,15 @@ in {
     neofetch
     binutils # for ldd, readelf etc
     patchelf # for fixing interpreter paths in fast-deployed binaries
+    # Libraries for fast-deployed binaries
+    libpcap
+    openssl
+    zlib
+    systemd
+    udev
+    glib
+    libudev-zero
+    libcap
   ];
 
   xdg.portal.enable = true;

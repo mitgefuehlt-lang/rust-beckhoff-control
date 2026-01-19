@@ -33,7 +33,9 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
 
       - name: Build Server Binary
-        run: cargo build --release -p server
+        run: |
+          cargo build --release -p server
+          strip target/release/server
         
       - name: Prepare Secrets
         id: sanitize
@@ -52,17 +54,23 @@ jobs:
 
       - name: Deploy Binary to Mini-PC
         run: |
-          ssh -o StrictHostKeyChecking=no konrad@nixos "sudo systemctl stop qitech-control-server || true"
-          ssh -o StrictHostKeyChecking=no konrad@nixos "sudo mkdir -p /var/lib/qitech && sudo chown konrad /var/lib/qitech"
-          scp -o StrictHostKeyChecking=no target/release/server konrad@nixos:/tmp/qitech-server
-          ssh -o StrictHostKeyChecking=no konrad@nixos "sudo mv /tmp/qitech-server /var/lib/qitech/server && sudo chmod +x /var/lib/qitech/server && sudo chown qitech-service:qitech-service /var/lib/qitech/server"
-          ssh -o StrictHostKeyChecking=no konrad@nixos 'nix-shell -p patchelf stdenv.cc.cc openssl zlib libpcap udev systemd glib libudev-zero libcap --run "INTERPRETER=\$(patchelf --print-interpreter /run/current-system/sw/bin/git) && RPATHS=\$LD_LIBRARY_PATH:/run/current-system/sw/lib && sudo patchelf --set-interpreter \$INTERPRETER --set-rpath \$RPATHS /var/lib/qitech/server"'
-          ssh -o StrictHostKeyChecking=no konrad@nixos "sudo systemctl start qitech-control-server"
+          ssh -o StrictHostKeyChecking=no konrad@nixos "sudo systemctl stop qitech-control-server || true; sudo mkdir -p /var/lib/qitech && sudo chown konrad /var/lib/qitech"
+          scp -o StrictHostKeyChecking=no -C target/release/server konrad@nixos:/tmp/qitech-server
+          ssh -o StrictHostKeyChecking=no konrad@nixos '
+            sudo mv /tmp/qitech-server /var/lib/qitech/server
+            sudo chmod +x /var/lib/qitech/server
+            sudo chown qitech-service:qitech-service /var/lib/qitech/server
+            INTERPRETER=$(/run/current-system/sw/bin/patchelf --print-interpreter /run/current-system/sw/bin/git)
+            sudo /run/current-system/sw/bin/patchelf --set-interpreter "$INTERPRETER" --set-rpath "/run/current-system/sw/lib" /var/lib/qitech/server
+            sudo systemctl start qitech-control-server
+          '
           
       - name: Verify Deployment
         run: |
-          echo "--- 🔍 Diagnostics ---"
-          ssh -o StrictHostKeyChecking=no konrad@nixos "echo '--- Library Check (ldd) ---' && ldd /var/lib/qitech/server || true"
-          ssh -o StrictHostKeyChecking=no konrad@nixos "echo '--- Service Environment (Check for RUST_LOG) ---' && systemctl show qitech-control-server --property=Environment --no-pager || true"
           echo "--- 🚀 Health Check ---"
-          ssh -o StrictHostKeyChecking=no konrad@nixos "systemctl is-active qitech-control-server || (sudo journalctl -u qitech-control-server --no-pager -n 50 && exit 1)"
+          ssh -o StrictHostKeyChecking=no konrad@nixos "
+            echo '--- Library Check ---'
+            ldd /var/lib/qitech/server || true
+            echo '--- Status ---'
+            systemctl is-active qitech-control-server || (sudo journalctl -u qitech-control-server --no-pager -n 20 && exit 1)
+          "

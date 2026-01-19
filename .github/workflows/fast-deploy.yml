@@ -26,6 +26,11 @@ jobs:
 
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
+
+      - name: Debug Secrets
+        run: |
+          if [ -z "${{ secrets.TS_OAUTH_CLIENT_ID }}" ]; then echo "::error::TS_OAUTH_CLIENT_ID is EMPTY"; else echo "TS_OAUTH_CLIENT_ID is set"; fi
+          if [ -z "${{ secrets.TS_OAUTH_SECRET }}" ]; then echo "::error::TS_OAUTH_SECRET is EMPTY"; else echo "TS_OAUTH_SECRET is set"; fi
         
       - name: Build Server Binary
         run: cargo build --release -p server

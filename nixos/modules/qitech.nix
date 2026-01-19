@@ -118,17 +118,6 @@ in {
         Environment = [
           "RUST_BACKTRACE=full"
           "RUST_LOG=info"
-          "LD_LIBRARY_PATH=${lib.makeLibraryPath [
-            pkgs.stdenv.cc.cc.lib
-            pkgs.openssl
-            pkgs.zlib
-            pkgs.libpcap
-            pkgs.udev
-            pkgs.systemd
-            pkgs.glib
-            pkgs.libudev-zero
-            pkgs.libcap
-          ]}"
         ];
       };
     };

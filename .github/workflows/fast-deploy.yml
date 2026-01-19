@@ -43,29 +43,26 @@ jobs:
           echo "CLEAN_CLIENT_ID=$CLIENT_ID" >> $GITHUB_ENV
           echo "::add-mask::$CLIENT_ID"
           echo "CLEAN_CLIENT_SECRET=$CLIENT_SECRET" >> $GITHUB_ENV
-          echo "::add-mask::$CLIENT_SECRET"
-
       - name: Setup Tailscale
         uses: tailscale/github-action@v3
         with:
           oauth-client-id: ${{ env.CLEAN_CLIENT_ID }}
           oauth-secret: ${{ env.CLEAN_CLIENT_SECRET }}
           tags: tag:ci
-          
+
       - name: Deploy Binary to Mini-PC
         run: |
           ssh -o StrictHostKeyChecking=no konrad@nixos "sudo systemctl stop qitech-control-server || true"
           ssh -o StrictHostKeyChecking=no konrad@nixos "sudo mkdir -p /var/lib/qitech && sudo chown konrad /var/lib/qitech"
           scp -o StrictHostKeyChecking=no target/release/server konrad@nixos:/tmp/qitech-server
           ssh -o StrictHostKeyChecking=no konrad@nixos "sudo mv /tmp/qitech-server /var/lib/qitech/server && sudo chmod +x /var/lib/qitech/server && sudo chown qitech-service:qitech-service /var/lib/qitech/server"
-          ssh -o StrictHostKeyChecking=no konrad@nixos 'nix-shell -p patchelf --run "INTERPRETER=\$(patchelf --print-interpreter /run/current-system/sw/bin/git) && sudo patchelf --set-interpreter \$INTERPRETER /var/lib/qitech/server"'
+          ssh -o StrictHostKeyChecking=no konrad@nixos 'nix-shell -p patchelf stdenv.cc.cc openssl zlib libpcap udev systemd glib libudev-zero libcap --run "INTERPRETER=\$(patchelf --print-interpreter /run/current-system/sw/bin/git) && RPATHS=\$LD_LIBRARY_PATH:/run/current-system/sw/lib && sudo patchelf --set-interpreter \$INTERPRETER --set-rpath \$RPATHS /var/lib/qitech/server"'
           ssh -o StrictHostKeyChecking=no konrad@nixos "sudo systemctl start qitech-control-server"
           
       - name: Verify Deployment
         run: |
           echo "--- 🔍 Diagnostics ---"
-          ssh -o StrictHostKeyChecking=no konrad@nixos "echo '--- Library Search (libudev) ---' && find /nix/store -maxdepth 4 -name 'libudev.so.1' 2>/dev/null | head -n 5 || true"
-          ssh -o StrictHostKeyChecking=no konrad@nixos "echo '--- Service Environment ---' && systemctl show qitech-control-server --property=Environment --no-pager || true"
-          ssh -o StrictHostKeyChecking=no konrad@nixos "echo '--- Library Dependencies (ldd) ---' && ldd /var/lib/qitech/server || true"
+          ssh -o StrictHostKeyChecking=no konrad@nixos "echo '--- Library Check (ldd) ---' && ldd /var/lib/qitech/server || true"
+          ssh -o StrictHostKeyChecking=no konrad@nixos "echo '--- Service Environment (Check for RUST_LOG) ---' && systemctl show qitech-control-server --property=Environment --no-pager || true"
           echo "--- 🚀 Health Check ---"
           ssh -o StrictHostKeyChecking=no konrad@nixos "systemctl is-active qitech-control-server || (sudo journalctl -u qitech-control-server --no-pager -n 50 && exit 1)"

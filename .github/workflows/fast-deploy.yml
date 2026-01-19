@@ -51,7 +51,6 @@ jobs:
         with:
           oauth-client-id: ${{ env.CLEAN_CLIENT_ID }}
           oauth-secret: ${{ env.CLEAN_CLIENT_SECRET }}
-          tags: tag:ci
           
       - name: Deploy Binary to Mini-PC
         run: |

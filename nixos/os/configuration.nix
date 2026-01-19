@@ -299,6 +299,7 @@ in {
     util-linux
     glib
     libudev-zero
+    libcap
   ];
 
   # List packages installed in system profile. To search, run:

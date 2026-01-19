@@ -65,4 +65,4 @@ jobs:
           
       - name: Verify Deployment
         run: |
-          ssh -o StrictHostKeyChecking=no konrad@nixos "systemctl is-active qitech-control-server"
+          ssh -o StrictHostKeyChecking=no konrad@nixos "systemctl is-active qitech-control-server || (sudo journalctl -u qitech-control-server --no-pager -n 50 && exit 1)"

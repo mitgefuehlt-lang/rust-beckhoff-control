@@ -9,6 +9,7 @@ on:
       - 'control-core/**'
       - 'Cargo.toml'
       - 'Cargo.lock'
+      - '.github/workflows/fast-deploy.yml'
 
 env:
   CARGO_TERM_COLOR: always

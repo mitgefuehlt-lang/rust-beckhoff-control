@@ -1,0 +1,42 @@
+name: Fast Deploy (Binary Only)
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+    paths:
+      - 'server/**'
+      - 'control-core/**'
+      - 'Cargo.toml'
+      - 'Cargo.lock'
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Install Rust
+        uses: dtolnay/rust-action@stable
+        
+      - name: Build Server Binary
+        run: cargo build --release -p server
+        
+      - name: Setup Tailscale
+        uses: tailscale/github-action@v3
+        with:
+          oauth-client-id: ${{ secrets.TS_OAUTH_CLIENT_ID }}
+          oauth-secret: ${{ secrets.TS_OAUTH_SECRET }}
+          tags: tag:ci
+          
+      - name: Deploy Binary to Mini-PC
+        run: |
+          scp -o StrictHostKeyChecking=no target/release/server deploy@mini-pc:~/server-new
+          ssh deploy@mini-pc "sudo systemctl stop qitech-control-server && sudo mv ~/server-new /run/current-system/sw/bin/server && sudo systemctl start qitech-control-server"
+          
+      - name: Verify Deployment
+        run: |
+          ssh deploy@mini-pc "systemctl is-active qitech-control-server"

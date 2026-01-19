@@ -26,6 +26,9 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y libpcap-dev libudev-dev
 
+      - name: Rust Cache
+        uses: Swatinem/rust-cache@v2
+        
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
 
@@ -56,7 +59,7 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no konrad@nixos "sudo mkdir -p /var/lib/qitech && sudo chown konrad /var/lib/qitech"
           scp -o StrictHostKeyChecking=no target/release/server konrad@nixos:/var/lib/qitech/server
-          ssh -o StrictHostKeyChecking=no konrad@nixos "sudo systemctl restart qitech-control-server"
+          ssh -o StrictHostKeyChecking=no konrad@nixos "chmod +x /var/lib/qitech/server && sudo systemctl restart qitech-control-server"
           
       - name: Verify Deployment
         run: |

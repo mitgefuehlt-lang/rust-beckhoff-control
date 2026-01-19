@@ -319,6 +319,8 @@ fn setup_ctrlc_handler() -> Arc<AtomicBool> {
 static ALLOC: dhat::Alloc = dhat::Alloc;
 
 fn main() {
+    env_logger::init();
+    println!("🚀 Fast Deploy Verification: System starting...");
     logging::init_tracing();
     tracing::info!("Tracing initialized successfully");
     init_panic_handling();

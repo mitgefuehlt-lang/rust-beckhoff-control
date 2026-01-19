@@ -119,18 +119,18 @@ in {
         RUST_BACKTRACE = "full";
         RUST_LOG = "info";
       } // (lib.optionalAttrs cfg.fastDeploy {
-        NIX_LD_LIBRARY_PATH = with pkgs; lib.makeLibraryPath [
-          stdenv.cc.cc
-          openssl
-          zlib
-          libpcap
-          udev
-          systemd
-          glib
-          libudev-zero
-          libcap
+        NIX_LD_LIBRARY_PATH = lib.makeLibraryPath [
+          pkgs.stdenv.cc.cc
+          pkgs.openssl
+          pkgs.zlib
+          pkgs.libpcap
+          pkgs.udev
+          pkgs.systemd
+          pkgs.glib
+          pkgs.libudev-zero
+          pkgs.libcap
         ];
-        NIX_LD = builtins.readFile "${pkgs.stdenv.cc}/nix-support/dynamic-linker";
+        NIX_LD = lib.fileContents "${pkgs.stdenv.cc}/nix-support/dynamic-linker";
       });
     };
 

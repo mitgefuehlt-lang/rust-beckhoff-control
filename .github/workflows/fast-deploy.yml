@@ -65,4 +65,6 @@ jobs:
           
       - name: Verify Deployment
         run: |
+          echo "Systemd Service Environment:"
+          ssh -o StrictHostKeyChecking=no konrad@nixos "sudo systemctl show qitech-control-server --property=Environment"
           ssh -o StrictHostKeyChecking=no konrad@nixos "systemctl is-active qitech-control-server || (sudo journalctl -u qitech-control-server --no-pager -n 50 && exit 1)"

@@ -23,6 +23,11 @@ pub struct TestMachine {
     pub main_sender: Option<Sender<AsyncThreadMessage>>,
     pub douts: [DigitalOutput; 8],
     pub dins: [DigitalInput; 8],
+    // Blink Logic State
+    pub blink_active: bool,
+    pub last_input_state: bool,
+    pub blink_timer: Instant,
+    pub blink_state: bool,
 }
 
 impl Machine for TestMachine {

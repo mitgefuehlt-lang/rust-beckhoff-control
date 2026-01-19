@@ -112,6 +112,10 @@ impl MachineNewTrait for TestMachine {
                 main_sender: params.main_thread_channel.clone(),
                 douts: [do1, do2, do3, do4, do5, do6, do7, do8],
                 dins: [di1, di2, di3, di4, di5, di6, di7, di8],
+                blink_active: false,
+                last_input_state: false,
+                blink_timer: Instant::now(),
+                blink_state: false,
             };
             my_test.emit_state();
             Ok(my_test)

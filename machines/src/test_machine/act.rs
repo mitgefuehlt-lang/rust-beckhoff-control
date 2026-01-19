@@ -8,12 +8,39 @@ impl MachineAct for TestMachine {
             self.act_machine_message(msg);
         }
 
-        // Logic: Pass through inputs to outputs
-        // If Input 1 is TRUE, set Output 1 to TRUE (Lamp on)
-        for i in 0..8 {
+        // Logic: Input 0 toggles Blink State for Output 0
+        if let Ok(current_input) = self.dins[0].get_value() {
+            // Edge Detection: Rising Edge
+            if current_input && !self.last_input_state {
+                self.blink_active = !self.blink_active;
+                tracing::info!("Toggle Blink: {}", self.blink_active);
+                
+                // Reset blink state when starting
+                if self.blink_active {
+                    self.blink_state = true;
+                    self.blink_timer = now;
+                }
+            }
+            self.last_input_state = current_input;
+        }
+
+        // Blinking Logic
+        if self.blink_active {
+            if now.duration_since(self.blink_timer) > Duration::from_millis(500) {
+                self.blink_state = !self.blink_state;
+                self.blink_timer = now;
+            }
+            self.douts[0].set(self.blink_state);
+            self.led_on[0] = self.blink_state;
+        } else {
+            // If not blinking, force off (or keep as pass-through? Let's keep it as toggle ONLY for 0)
+            self.douts[0].set(false);
+            self.led_on[0] = false;
+        }
+
+        // Pass-through for other inputs (1-7)
+        for i in 1..8 {
             if let Ok(val) = self.dins[i].get_value() {
-                // Only update if changed or force update? 
-                // Just setting it every cycle is fine for Logic, the driver handles redundancies usually
                 self.douts[i].set(val);
                 self.led_on[i] = val;
             }

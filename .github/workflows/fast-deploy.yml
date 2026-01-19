@@ -57,27 +57,16 @@ jobs:
           ssh -o StrictHostKeyChecking=no konrad@nixos "sudo systemctl stop qitech-control-server || true; sudo mkdir -p /var/lib/qitech && sudo chown konrad /var/lib/qitech"
           scp -o StrictHostKeyChecking=no -C target/release/server konrad@nixos:/tmp/qitech-server
           ssh -o StrictHostKeyChecking=no konrad@nixos '
-            set -x
-            BIN_PATH="/var/lib/qitech/server"
-            SYS_BIN="/run/current-system/sw/bin"
+            sudo mv /tmp/qitech-server /var/lib/qitech/server
+            sudo chmod +x /var/lib/qitech/server
+            sudo chown qitech-service:qitech-service /var/lib/qitech/server
             
-            sudo mv /tmp/qitech-server $BIN_PATH
-            sudo chmod +x $BIN_PATH
-            sudo chown qitech-service:qitech-service $BIN_PATH
-            
-            # Discovery via readelf
-            REAL_GIT=$(readlink -f $SYS_BIN/git)
-            INTERPRETER=$($SYS_BIN/readelf -l $REAL_GIT | grep "program interpreter" | cut -d: -f2 | xargs)
-            RPATHS="/run/current-system/sw/lib"
-            
-            echo "DEBUG: INTERPRETER=$INTERPRETER"
-            echo "DEBUG: RPATHS=$RPATHS"
-            
-            if [ -n "$INTERPRETER" ]; then
-              sudo $SYS_BIN/patchelf --set-interpreter "$INTERPRETER" --set-rpath "$RPATHS" $BIN_PATH
-            else
-              echo "ERROR: Could not find interpreter!" && exit 1
-            fi
+            # Robust Patching via nix-shell (Takes ~30s but ALWAYS works)
+            nix-shell -p patchelf stdenv.cc.cc openssl zlib libpcap udev systemd glib libudev-zero libcap --run "
+              INTERPRETER=\$(patchelf --print-interpreter /run/current-system/sw/bin/git)
+              RPATHS=\$LD_LIBRARY_PATH:/run/current-system/sw/lib
+              sudo patchelf --set-interpreter \$INTERPRETER --set-rpath \$RPATHS /var/lib/qitech/server
+            "
             
             sudo systemctl start qitech-control-server
           '
@@ -86,6 +75,5 @@ jobs:
         run: |
           echo "--- 🚀 Health Check ---"
           ssh -o StrictHostKeyChecking=no konrad@nixos "
-            echo '--- Status ---'
-            systemctl is-active qitech-control-server && echo 'ONLINE' || (sudo journalctl -u qitech-control-server --no-pager -n 10 && exit 1)
+            systemctl is-active qitech-control-server && echo 'ONLINE' || (sudo journalctl -u qitech-control-server --no-pager -n 20 && exit 1)
           "

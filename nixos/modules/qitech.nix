@@ -125,6 +125,7 @@ in {
             pkgs.zlib
             pkgs.libpcap
             pkgs.udev
+            pkgs.systemd
             pkgs.systemd.lib
             pkgs.glib
             pkgs.libudev-zero

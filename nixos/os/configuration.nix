@@ -291,6 +291,11 @@ in {
     libpcap
     systemd
     stdenv.cc.cc
+    udev
+    alsa-lib
+    openssl
+    zlib
+    glibc
   ];
 
   # List packages installed in system profile. To search, run:

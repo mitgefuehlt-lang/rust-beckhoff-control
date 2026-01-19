@@ -57,7 +57,7 @@ jobs:
           ssh -o StrictHostKeyChecking=no konrad@nixos "sudo systemctl stop qitech-control-server || true; sudo mkdir -p /var/lib/qitech && sudo chown konrad /var/lib/qitech"
           scp -o StrictHostKeyChecking=no -C target/release/server konrad@nixos:/tmp/qitech-server
           ssh -o StrictHostKeyChecking=no konrad@nixos '
-            # Ultra Speed Patching: No nix-shell, only direct system calls
+            set -x
             BIN_PATH="/var/lib/qitech/server"
             SYS_BIN="/run/current-system/sw/bin"
             
@@ -65,12 +65,19 @@ jobs:
             sudo chmod +x $BIN_PATH
             sudo chown qitech-service:qitech-service $BIN_PATH
             
-            # Discovery via readelf (lightning fast)
-            INTERPRETER=$($SYS_BIN/readelf -l $SYS_BIN/git | grep "program interpreter" | cut -d: -f2 | xargs)
+            # Discovery via readelf
+            REAL_GIT=$(readlink -f $SYS_BIN/git)
+            INTERPRETER=$($SYS_BIN/readelf -l $REAL_GIT | grep "program interpreter" | cut -d: -f2 | xargs)
             RPATHS="/run/current-system/sw/lib"
             
-            # Apply patches directly
-            sudo $SYS_BIN/patchelf --set-interpreter "$INTERPRETER" --set-rpath "$RPATHS" $BIN_PATH
+            echo "DEBUG: INTERPRETER=$INTERPRETER"
+            echo "DEBUG: RPATHS=$RPATHS"
+            
+            if [ -n "$INTERPRETER" ]; then
+              sudo $SYS_BIN/patchelf --set-interpreter "$INTERPRETER" --set-rpath "$RPATHS" $BIN_PATH
+            else
+              echo "ERROR: Could not find interpreter!" && exit 1
+            fi
             
             sudo systemctl start qitech-control-server
           '

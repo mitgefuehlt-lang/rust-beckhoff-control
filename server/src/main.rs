@@ -320,7 +320,7 @@ static ALLOC: dhat::Alloc = dhat::Alloc;
 
 fn main() {
     env_logger::init();
-    println!("🚀 Fast Deploy Verification: System starting...");
+    println!("🚀 Fast Deploy Verification: Retrying with dependencies...");
     logging::init_tracing();
     tracing::info!("Tracing initialized successfully");
     init_panic_handling();

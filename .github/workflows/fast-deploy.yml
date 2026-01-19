@@ -7,6 +7,7 @@ on:
     paths:
       - 'server/**'
       - 'control-core/**'
+      - 'machines/**'
       - 'Cargo.toml'
       - 'Cargo.lock'
       - '.github/workflows/fast-deploy.yml'
@@ -28,16 +29,13 @@ jobs:
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
 
-      - name: Debug Secrets
-        run: |
-          if [ -z "${{ secrets.TS_OAUTH_CLIENT_ID }}" ]; then echo "::error::❌ TS_OAUTH_CLIENT_ID is EMPTY! Check GitHub Secrets."; exit 1; fi
-          if [ -z "${{ secrets.TS_OAUTH_SECRET }}" ]; then echo "::error::❌ TS_OAUTH_SECRET is EMPTY! Check GitHub Secrets."; exit 1; fi
-          echo "✅ Secrets are present."
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
         
       - name: Build Server Binary
         run: cargo build --release -p server
         
-      - name: Sanitize Secrets
+      - name: Prepare Secrets
         id: sanitize
         run: |
           CLIENT_ID=$(echo "${{ secrets.TS_OAUTH_CLIENT_ID }}" | xargs)

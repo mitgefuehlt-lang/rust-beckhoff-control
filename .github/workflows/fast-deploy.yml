@@ -32,9 +32,6 @@ jobs:
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
 
-      - name: Install Rust
-        uses: dtolnay/rust-toolchain@stable
-        
       - name: Build Server Binary
         run: cargo build --release -p server
         
@@ -61,13 +58,13 @@ jobs:
           scp -o StrictHostKeyChecking=no target/release/server konrad@nixos:/tmp/qitech-server
           ssh -o StrictHostKeyChecking=no konrad@nixos "sudo mv /tmp/qitech-server /var/lib/qitech/server && sudo chmod +x /var/lib/qitech/server && sudo chown qitech-service:qitech-service /var/lib/qitech/server"
           ssh -o StrictHostKeyChecking=no konrad@nixos 'nix-shell -p patchelf --run "INTERPRETER=\$(patchelf --print-interpreter /run/current-system/sw/bin/git) && sudo patchelf --set-interpreter \$INTERPRETER /var/lib/qitech/server"'
-          ssh -o StrictHostKeyChecking=no konrad@nixos "echo '--- Library Search ---' && find /nix/store -maxdepth 4 -name '*libudev.so.1*' 2>/dev/null | head -n 10 || true"
-          ssh -o StrictHostKeyChecking=no konrad@nixos "echo '--- Service Environment ---' && systemctl show qitech-control-server --property=Environment --no-pager || true"
-          ssh -o StrictHostKeyChecking=no konrad@nixos "echo '--- Binary Info ---' && file /var/lib/qitech/server && echo '--- Interpreter Check ---' && readelf -l /var/lib/qitech/server | grep interpreter || true && echo '--- Library Check ---' && ldd /var/lib/qitech/server || true"
           ssh -o StrictHostKeyChecking=no konrad@nixos "sudo systemctl restart qitech-control-server"
           
       - name: Verify Deployment
         run: |
-          echo "Systemd Service Environment:"
-          ssh -o StrictHostKeyChecking=no konrad@nixos "sudo systemctl show qitech-control-server --property=Environment"
+          echo "--- 🔍 Diagnostics ---"
+          ssh -o StrictHostKeyChecking=no konrad@nixos "echo '--- Library Search (libudev) ---' && find /nix/store -maxdepth 4 -name 'libudev.so.1' 2>/dev/null | head -n 5 || true"
+          ssh -o StrictHostKeyChecking=no konrad@nixos "echo '--- Service Environment ---' && systemctl show qitech-control-server --property=Environment --no-pager || true"
+          ssh -o StrictHostKeyChecking=no konrad@nixos "echo '--- Library Dependencies (ldd) ---' && ldd /var/lib/qitech/server || true"
+          echo "--- 🚀 Health Check ---"
           ssh -o StrictHostKeyChecking=no konrad@nixos "systemctl is-active qitech-control-server || (sudo journalctl -u qitech-control-server --no-pager -n 50 && exit 1)"

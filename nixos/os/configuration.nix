@@ -387,6 +387,9 @@ in {
     };
   };
 
+  # Tailscale VPN for secure remote access
+  services.tailscale.enable = true;
+
   # Open ports in the firewall.
   # networking.firewall.allowedTCPPorts = [ ... ];
   networking.firewall.allowedUDPPorts = [ 53 67 69 ];

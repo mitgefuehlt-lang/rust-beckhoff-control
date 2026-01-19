@@ -60,7 +60,8 @@ jobs:
           ssh -o StrictHostKeyChecking=no konrad@nixos "sudo mkdir -p /var/lib/qitech && sudo chown konrad /var/lib/qitech"
           scp -o StrictHostKeyChecking=no target/release/server konrad@nixos:/tmp/qitech-server
           ssh -o StrictHostKeyChecking=no konrad@nixos "sudo mv /tmp/qitech-server /var/lib/qitech/server && sudo chmod +x /var/lib/qitech/server && sudo chown qitech-service:qitech-service /var/lib/qitech/server"
-          ssh -o StrictHostKeyChecking=no konrad@nixos "nix-shell -p patchelf --run \"INTERPRETER=\\\$(patchelf --print-interpreter /run/current-system/sw/bin/git) && sudo patchelf --set-interpreter \\\"\\\$INTERPRETER\\\" /var/lib/qitech/server\""
+          ssh -o StrictHostKeyChecking=no konrad@nixos 'nix-shell -p patchelf --run "INTERPRETER=\$(patchelf --print-interpreter /run/current-system/sw/bin/git) && sudo patchelf --set-interpreter \$INTERPRETER /var/lib/qitech/server"'
+          ssh -o StrictHostKeyChecking=no konrad@nixos "echo '--- Library Search ---' && find /nix/store -maxdepth 3 -name '*libudev.so.1*' 2>/dev/null | head -n 5 || true"
           ssh -o StrictHostKeyChecking=no konrad@nixos "echo '--- Binary Info ---' && file /var/lib/qitech/server && echo '--- Interpreter Check ---' && readelf -l /var/lib/qitech/server | grep interpreter || true && echo '--- Library Check ---' && ldd /var/lib/qitech/server || true"
           ssh -o StrictHostKeyChecking=no konrad@nixos "sudo systemctl restart qitech-control-server"
           

@@ -113,25 +113,25 @@ in {
         StandardOutput = "journal";
         StandardError = "journal";
         SyslogIdentifier = "qitech-control-server";
-      };
 
-      environment = {
-        RUST_BACKTRACE = "full";
-        RUST_LOG = "info";
-      } // (lib.optionalAttrs cfg.fastDeploy {
-        NIX_LD_LIBRARY_PATH = lib.makeLibraryPath [
-          pkgs.stdenv.cc.cc
-          pkgs.openssl
-          pkgs.zlib
-          pkgs.libpcap
-          pkgs.udev
-          pkgs.systemd
-          pkgs.glib
-          pkgs.libudev-zero
-          pkgs.libcap
-        ];
-        NIX_LD = lib.fileContents "${pkgs.stdenv.cc}/nix-support/dynamic-linker";
-      });
+        Environment = [
+          "RUST_BACKTRACE=full"
+          "RUST_LOG=info"
+        ] ++ (lib.optionals cfg.fastDeploy [
+          "NIX_LD_LIBRARY_PATH=${lib.makeLibraryPath [
+            pkgs.stdenv.cc.cc
+            pkgs.openssl
+            pkgs.zlib
+            pkgs.libpcap
+            pkgs.udev
+            pkgs.systemd
+            pkgs.glib
+            pkgs.libudev-zero
+            pkgs.libcap
+          ]}"
+          "NIX_LD=${lib.fileContents "${pkgs.stdenv.cc}/nix-support/dynamic-linker"}"
+        ]);
+      };
     };
 
     # Add real-time privileges

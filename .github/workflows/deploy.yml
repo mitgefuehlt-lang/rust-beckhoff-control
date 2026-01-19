@@ -1,28 +1,38 @@
-name: Deploy to NixOS Mini PC
+name: Deploy to NixOS Mini PC (System Update)
 
 on:
   workflow_dispatch:
 
-
 jobs:
   deploy:
-    runs-on: self-hosted
-    # Only allow one deployment at a time to avoid lock contention
+    runs-on: ubuntu-latest
     concurrency: production_deploy
     
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
-      - name: Update Flake Lock
-        # Optional: ensure we are using fresh dependencies if desired, 
-        # but usually we want to deploy exactly what is in the lockfile.
-        # So we skip updating the lockfile here to ensure determinism.
-        run: echo "Using existing flake.lock"
+      - name: Prepare Secrets
+        id: sanitize
+        run: |
+          CLIENT_ID=$(echo "${{ secrets.TS_OAUTH_CLIENT_ID }}" | xargs)
+          CLIENT_SECRET=$(echo "${{ secrets.TS_OAUTH_SECRET }}" | xargs)
+          echo "CLEAN_CLIENT_ID=$CLIENT_ID" >> $GITHUB_ENV
+          echo "::add-mask::$CLIENT_ID"
+          echo "CLEAN_CLIENT_SECRET=$CLIENT_SECRET" >> $GITHUB_ENV
+          echo "::add-mask::$CLIENT_SECRET"
 
-      - name: Rebuild NixOS
-        run: /run/current-system/sw/bin/nixos-rebuild switch --flake .
+      - name: Setup Tailscale
+        uses: tailscale/github-action@v3
+        with:
+          oauth-client-id: ${{ env.CLEAN_CLIENT_ID }}
+          oauth-secret: ${{ env.CLEAN_CLIENT_SECRET }}
+          tags: tag:ci
+
+      - name: Rebuild NixOS via SSH
+        run: |
+          ssh -o StrictHostKeyChecking=no konrad@nixos "cd /run/github-runner/nix-runner/rust-beckhoff-control/rust-beckhoff-control && sudo nixos-rebuild switch --flake ."
           
       - name: Verify Service Status
         run: |
-          systemctl is-active qitech.service || echo "Warning: qitech service not active!"
+          ssh -o StrictHostKeyChecking=no konrad@nixos "systemctl is-active qitech-control-server"

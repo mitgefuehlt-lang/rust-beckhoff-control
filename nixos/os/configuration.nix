@@ -319,6 +319,7 @@ in {
     pciutils
     neofetch
     binutils # for ldd, readelf etc
+    patchelf # for fixing interpreter paths in fast-deployed binaries
   ];
 
   xdg.portal.enable = true;

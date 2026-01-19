@@ -47,7 +47,7 @@ jobs:
           echo "::add-mask::$CLIENT_SECRET"
 
       - name: Setup Tailscale
-        uses: tailscale/github-action@v2
+        uses: tailscale/github-action@v3
         with:
           oauth-client-id: ${{ env.CLEAN_CLIENT_ID }}
           oauth-secret: ${{ env.CLEAN_CLIENT_SECRET }}

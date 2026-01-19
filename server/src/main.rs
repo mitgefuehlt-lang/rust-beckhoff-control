@@ -319,7 +319,7 @@ fn setup_ctrlc_handler() -> Arc<AtomicBool> {
 static ALLOC: dhat::Alloc = dhat::Alloc;
 
 fn main() {
-    println!("🚀 Fast Deploy: Authentication Fixed! Checking deployment...");
+    println!("🚀 Fast Deploy: Force Trigger! Checking deployment...");
     logging::init_tracing();
     tracing::info!("Tracing initialized successfully");
     init_panic_handling();

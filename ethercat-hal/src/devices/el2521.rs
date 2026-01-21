@@ -409,16 +409,8 @@ mod tests {
         let rxpdo = EL2521RxPdo {
             pto_control: Some(PtoControl {
                 go_counter: true,
-                stop_counter: false,
-                set_counter: false,
-                reset_counter: false,
-                select_end_counter: false,
-                input_z_logic: false,
-                reset: false,
-                input_t_logic: false,
                 disable_ramp: true,
                 frequency_select: true,
-                control_toggle: true,
                 frequency_value: 1000,
             }),
             pto_target: Some(PtoTarget {

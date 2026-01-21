@@ -73,11 +73,6 @@ impl MachineAct for TestMachine {
                         disable_ramp: false,
                         frequency_select: true,
                         go_counter: self.motor_running,
-                        stop_counter: false,
-                        reset_counter: false,
-                        reset: false,
-                        select_end_counter: false,
-                        control_toggle: (now.duration_since(self.start_time).as_micros() / 100000) % 2 == 0, // Toggle every 100ms
                         set_counter: set_counter_trigger,
                         set_counter_value: 0,
                     },

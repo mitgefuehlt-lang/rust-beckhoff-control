@@ -70,12 +70,6 @@ impl PulseTrainOutputDevice<EL2522Port> for EL2522 {
         pto_control.disable_ramp = value.disable_ramp;
         pto_control.frequency_select = value.frequency_select;
         pto_control.go_counter = value.go_counter;
-        pto_control.stop_counter = value.stop_counter;
-        pto_control.set_counter = value.set_counter;
-        pto_control.reset_counter = value.reset_counter;
-        pto_control.select_end_counter = value.select_end_counter;
-        pto_control.reset = value.reset;
-        pto_control.control_toggle = value.control_toggle;
         pto_control.frequency_value = value.frequency_value;
         pto_target.target_counter_value = value.target_counter_value;
         enc_control.set_counter = value.set_counter;
@@ -89,14 +83,9 @@ impl PulseTrainOutputDevice<EL2522Port> for EL2522 {
             disable_ramp: pto_control.disable_ramp,
             frequency_select: pto_control.frequency_select,
             go_counter: pto_control.go_counter,
-            stop_counter: pto_control.stop_counter,
-            set_counter: pto_control.set_counter,
-            reset_counter: pto_control.reset_counter,
-            select_end_counter: pto_control.select_end_counter,
-            reset: pto_control.reset,
-            control_toggle: pto_control.control_toggle,
             frequency_value: pto_control.frequency_value,
             target_counter_value: pto_target.target_counter_value,
+            set_counter: enc_control.set_counter,
             set_counter_value: enc_control.set_counter_value,
         }
     }
@@ -104,17 +93,16 @@ impl PulseTrainOutputDevice<EL2522Port> for EL2522 {
         let (pto_status, enc_status) = self.get_txpdo(port);
 
         PulseTrainOutputInput {
-            select_ack: pto_status.select_ack,
+            select_end_counter: pto_status.select_end_counter,
             ramp_active: pto_status.ramp_active,
-            set_counter_done: pto_status.set_counter_done,
-            counter_underflow: pto_status.counter_underflow,
-            counter_overflow: pto_status.counter_overflow,
             input_t: pto_status.input_t,
             input_z: pto_status.input_z,
             error: pto_status.error,
             sync_error: pto_status.sync_error,
-            txpdo_state: pto_status.txpdo_state,
             txpdo_toggle: pto_status.txpdo_toggle,
+            set_counter_done: enc_status.set_counter_done,
+            counter_underflow: enc_status.counter_underflow,
+            counter_overflow: enc_status.counter_overflow,
             counter_value: enc_status.counter_value,
         }
     }

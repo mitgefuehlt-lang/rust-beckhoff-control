@@ -50,12 +50,6 @@ impl PulseTrainOutputDevice<EL2521Port> for EL2521 {
         self.rxpdo.pto_control.as_mut().unwrap().disable_ramp = value.disable_ramp;
         self.rxpdo.pto_control.as_mut().unwrap().frequency_select = value.frequency_select;
         self.rxpdo.pto_control.as_mut().unwrap().go_counter = value.go_counter;
-        self.rxpdo.pto_control.as_mut().unwrap().stop_counter = value.stop_counter;
-        self.rxpdo.pto_control.as_mut().unwrap().set_counter = value.set_counter;
-        self.rxpdo.pto_control.as_mut().unwrap().reset_counter = value.reset_counter;
-        self.rxpdo.pto_control.as_mut().unwrap().select_end_counter = value.select_end_counter;
-        self.rxpdo.pto_control.as_mut().unwrap().reset = value.reset;
-        self.rxpdo.pto_control.as_mut().unwrap().control_toggle = value.control_toggle;
         self.rxpdo.pto_control.as_mut().unwrap().frequency_value = value.frequency_value;
         self.rxpdo.pto_target.as_mut().unwrap().target_counter_value = value.target_counter_value;
         self.rxpdo.enc_control.as_mut().unwrap().set_counter = value.set_counter;
@@ -67,31 +61,25 @@ impl PulseTrainOutputDevice<EL2521Port> for EL2521 {
             disable_ramp: self.rxpdo.pto_control.as_ref().unwrap().disable_ramp,
             frequency_select: self.rxpdo.pto_control.as_ref().unwrap().frequency_select,
             go_counter: self.rxpdo.pto_control.as_ref().unwrap().go_counter,
-            stop_counter: self.rxpdo.pto_control.as_ref().unwrap().stop_counter,
-            set_counter: self.rxpdo.pto_control.as_ref().unwrap().set_counter,
-            reset_counter: self.rxpdo.pto_control.as_ref().unwrap().reset_counter,
-            select_end_counter: self.rxpdo.pto_control.as_ref().unwrap().select_end_counter,
-            reset: self.rxpdo.pto_control.as_ref().unwrap().reset,
-            control_toggle: self.rxpdo.pto_control.as_ref().unwrap().control_toggle,
             frequency_value: self.rxpdo.pto_control.as_ref().unwrap().frequency_value,
             target_counter_value: self.rxpdo.pto_target.as_ref().unwrap().target_counter_value,
+            set_counter: self.rxpdo.enc_control.as_ref().unwrap().set_counter,
             set_counter_value: self.rxpdo.enc_control.as_ref().unwrap().set_counter_value,
         }
     }
 
     fn get_input(&self, _port: EL2521Port) -> PulseTrainOutputInput {
         PulseTrainOutputInput {
-            select_ack: self.txpdo.pto_status.as_ref().unwrap().select_ack,
+            select_end_counter: self.txpdo.pto_status.as_ref().unwrap().select_end_counter,
             ramp_active: self.txpdo.pto_status.as_ref().unwrap().ramp_active,
-            set_counter_done: self.txpdo.pto_status.as_ref().unwrap().set_counter_done,
-            counter_underflow: self.txpdo.pto_status.as_ref().unwrap().counter_underflow,
-            counter_overflow: self.txpdo.pto_status.as_ref().unwrap().counter_overflow,
             input_t: self.txpdo.pto_status.as_ref().unwrap().input_t,
             input_z: self.txpdo.pto_status.as_ref().unwrap().input_z,
             error: self.txpdo.pto_status.as_ref().unwrap().error,
             sync_error: self.txpdo.pto_status.as_ref().unwrap().sync_error,
-            txpdo_state: self.txpdo.pto_status.as_ref().unwrap().txpdo_state,
             txpdo_toggle: self.txpdo.pto_status.as_ref().unwrap().txpdo_toggle,
+            set_counter_done: self.txpdo.enc_status.as_ref().unwrap().set_counter_done,
+            counter_underflow: self.txpdo.enc_status.as_ref().unwrap().counter_underflow,
+            counter_overflow: self.txpdo.enc_status.as_ref().unwrap().counter_overflow,
             counter_value: self.txpdo.enc_status.as_ref().unwrap().counter_value,
         }
     }

@@ -277,7 +277,7 @@ pub async fn setup_loop(
     // extract device identifications
     // Use fold to track assigned roles while building the result
     let results = read_device_identifications(&subdevices, &maindevice).await;
-    
+
     let device_identifications: Vec<DeviceIdentification> = results
         .into_iter()
         .zip(&subdevices)
@@ -307,19 +307,26 @@ pub async fn setup_loop(
                     );
 
                     // Default Fake ID for TestMachine
-                    let fake_unique = machines::machine_identification::MachineIdentificationUnique {
-                        machine_identification: machines::machine_identification::MachineIdentification {
-                            vendor: 0x0001,  // VENDOR_QITECH
-                            machine: 0x0033, // TEST_MACHINE
-                        },
-                        serial: 1,
-                    };
+                    let fake_unique =
+                        machines::machine_identification::MachineIdentificationUnique {
+                            machine_identification:
+                                machines::machine_identification::MachineIdentification {
+                                    vendor: 0x0001,  // VENDOR_QITECH
+                                    machine: 0x0033, // TEST_MACHINE
+                                },
+                            serial: 1,
+                        };
 
                     // Determine role based on device name, ensuring no duplicates
-                    let desired_role = if name == "EL1008" { Some(0u16) }
-                        else if name == "EL2008" { Some(1u16) }
-                        else if name == "EL2522" { Some(2u16) }
-                        else { None };
+                    let desired_role = if name == "EL1008" {
+                        Some(0u16)
+                    } else if name == "EL2008" {
+                        Some(1u16)
+                    } else if name == "EL2522" {
+                        Some(2u16)
+                    } else {
+                        None
+                    };
 
                     let role = match desired_role {
                         Some(r) if !assigned_roles.contains(&r) => {

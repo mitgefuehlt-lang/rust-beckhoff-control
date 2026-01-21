@@ -72,13 +72,13 @@ export function usePresets<T extends PresetSchema>({
     defaultState === undefined
       ? undefined
       : {
-          id: -1,
-          name: "Machine Defaults",
-          machineIdentification: machine_identification,
-          lastModified: new Date(0),
-          schemaVersion,
-          data: defaultState,
-        };
+        id: -1,
+        name: "Machine Defaults",
+        machineIdentification: machine_identification,
+        lastModified: new Date(0),
+        schemaVersion,
+        data: defaultState,
+      };
 
   const createFromCurrentState = (name: string): Preset<T> => {
     const preset = store.insert({
@@ -125,7 +125,7 @@ export function usePresets<T extends PresetSchema>({
     if (latestPresetId === undefined) {
       const preset = store.insert({
         id: undefined,
-        name: "Latest Machine Stettings",
+        name: "Latest Machine Settings",
         machineIdentification: machine_identification,
         lastModified: new Date(),
         schemaVersion,

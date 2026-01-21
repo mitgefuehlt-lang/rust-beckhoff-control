@@ -33,7 +33,11 @@ buildNpmPackage rec {
     mkdir -p $out/bin
     cat > $out/bin/qitech-control-electron << EOF
     #!/bin/sh
-    appdir="$out/share/qitech-control-electron"
+    if [ -d /var/lib/qitech/electron ]; then
+      appdir="/var/lib/qitech/electron"
+    else
+      appdir="$out/share/qitech-control-electron"
+    fi
     cd "\$appdir"
     exec nice -n -20 ${electron}/bin/electron "\$appdir/main.js" \
       --no-sandbox \

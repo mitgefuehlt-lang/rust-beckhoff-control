@@ -11,6 +11,7 @@ on:
       - 'Cargo.toml'
       - 'Cargo.lock'
       - '.github/workflows/fast-deploy.yml'
+      - 'electron/**'
 
 env:
   CARGO_TERM_COLOR: always
@@ -25,6 +26,13 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y libpcap-dev libudev-dev
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: electron/package-lock.json
 
       - name: Rust Cache
         uses: Swatinem/rust-cache@v2
@@ -52,9 +60,20 @@ jobs:
           oauth-secret: ${{ env.CLEAN_CLIENT_SECRET }}
           tags: tag:ci
 
-      - name: Deploy Binary to Mini-PC
+      - name: Build Electron UI
+        working-directory: electron
         run: |
-          ssh -o StrictHostKeyChecking=no konrad@nixos "sudo systemctl stop qitech-control-server || true; sudo mkdir -p /var/lib/qitech && sudo chown konrad /var/lib/qitech"
+          npm install
+          npm run build
+
+      - name: Deploy Binary & UI to Mini-PC
+        run: |
+          ssh -o StrictHostKeyChecking=no konrad@nixos "sudo systemctl stop qitech-control-server || true; sudo mkdir -p /var/lib/qitech/electron && sudo chown -R konrad /var/lib/qitech"
+          # Sync Electron assets
+          scp -o StrictHostKeyChecking=no -r electron/dist/* konrad@nixos:/var/lib/qitech/electron/
+          scp -o StrictHostKeyChecking=no -r electron/dist-electron/* konrad@nixos:/var/lib/qitech/electron/
+          
+          # Deploy Server Binary
           scp -o StrictHostKeyChecking=no -C target/release/server konrad@nixos:/tmp/qitech-server
           ssh -o StrictHostKeyChecking=no konrad@nixos '
             sudo mv /tmp/qitech-server /var/lib/qitech/server

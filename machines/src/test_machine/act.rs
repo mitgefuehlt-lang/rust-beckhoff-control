@@ -36,14 +36,25 @@ impl MachineAct for TestMachine {
 
         // --- Motor Control Logic (Runs every cycle) ---
         {
-            // Speed: 5.0 mm/s -> 100 pulses/s (at 20 steps/mm)
-            // Resolution: 0.01 Hz -> a value of 10000 in PDO = 100.00 Hz
-            let motor_speed_mm_s = if self.motor_running { 5.0 } else { 0.0 };
+            // Speed: 10.0 mm/s -> 200 pulses/s (at 20 steps/mm)
+            // Resolution: 0.01 Hz -> a value of 20000 in PDO = 200.00 Hz
+            let motor_speed_mm_s = if self.motor_running { 10.0 } else { 0.0 };
             let motor_target_pulses = (self.motor_target_mm * 20.0) as u32;
             let motor_frequency_pdo = (motor_speed_mm_s * 20.0 * 100.0) as i32;
 
             let mut pto = smol::block_on(self.pto.write());
             let current_output = pto.get_output(EL2522Port::PTO2);
+            let current_input = pto.get_input(EL2522Port::PTO2);
+
+            // Diagnostics (Slow down to once per second if needed, but here simple if motor_running)
+            if self.motor_running {
+                // We use a small hack to log only occasionally
+                if (now.as_secs_f64() * 2.0) as u64 % 2 == 0 {
+                   // tracing::info!("[TestMachine] PTO Status: error={} underflow={} overflow={} ramp={} freq_sel={} counter={}", 
+                   //     current_input.error, current_input.counter_underflow, current_input.counter_overflow, 
+                   //     current_input.ramp_active, current_input.frequency_select, current_input.counter_value);
+                }
+            }
 
             // Pulse the set_counter bit only for ONE cycle on motor start
             let mut set_counter_trigger = false;
@@ -72,6 +83,9 @@ impl MachineAct for TestMachine {
                         disble_ramp: false,
                         frequency_select: true,
                         go_counter: self.motor_running,
+                        stop_counter: false,
+                        reset: false,
+                        select_end_counter: false,
                         set_counter: set_counter_trigger,
                         set_counter_value: 0,
                     },

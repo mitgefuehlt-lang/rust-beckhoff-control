@@ -81,7 +81,7 @@ pub struct PulseTrainOutputState {
 
 #[derive(Debug, Clone)]
 pub struct PulseTrainOutputInput {
-    pub select_end_counter: bool,
+    pub frequency_select: bool,
     pub ramp_active: bool,
     pub input_t: bool,
     pub input_z: bool,
@@ -98,6 +98,9 @@ pub struct PulseTrainOutputOutput {
     pub disble_ramp: bool,
     pub frequency_select: bool,
     pub go_counter: bool,
+    pub stop_counter: bool,
+    pub select_end_counter: bool,
+    pub reset: bool,
     pub frequency_value: i32,
     pub target_counter_value: u32,
     pub set_counter: bool,

@@ -70,6 +70,9 @@ impl PulseTrainOutputDevice<EL2522Port> for EL2522 {
         pto_control.disble_ramp = value.disble_ramp;
         pto_control.frequency_select = value.frequency_select;
         pto_control.go_counter = value.go_counter;
+        pto_control.stop_counter = value.stop_counter;
+        pto_control.select_end_counter = value.select_end_counter;
+        pto_control.reset = value.reset;
         pto_control.frequency_value = value.frequency_value;
         pto_target.target_counter_value = value.target_counter_value;
         enc_control.set_counter = value.set_counter;
@@ -83,6 +86,9 @@ impl PulseTrainOutputDevice<EL2522Port> for EL2522 {
             disble_ramp: pto_control.disble_ramp,
             frequency_select: pto_control.frequency_select,
             go_counter: pto_control.go_counter,
+            stop_counter: pto_control.stop_counter,
+            select_end_counter: pto_control.select_end_counter,
+            reset: pto_control.reset,
             frequency_value: pto_control.frequency_value,
             target_counter_value: pto_target.target_counter_value,
             set_counter: enc_control.set_counter,
@@ -93,14 +99,14 @@ impl PulseTrainOutputDevice<EL2522Port> for EL2522 {
         let (pto_status, enc_status) = self.get_txpdo(port);
 
         PulseTrainOutputInput {
-            select_end_counter: pto_status.select_end_counter,
+            frequency_select: pto_status.frequency_select,
             ramp_active: pto_status.ramp_active,
             input_t: pto_status.input_t,
             input_z: pto_status.input_z,
             error: pto_status.error,
             sync_error: pto_status.sync_error,
-            counter_underflow: enc_status.counter_underflow,
-            counter_overflow: enc_status.counter_overflow,
+            counter_underflow: pto_status.counter_underflow,
+            counter_overflow: pto_status.counter_overflow,
             counter_value: enc_status.counter_value,
             set_counter_done: enc_status.set_counter_done,
         }
@@ -468,8 +474,8 @@ impl From<EL2522OperatingMode> for u8 {
     fn from(value: EL2522OperatingMode) -> Self {
         match value {
             EL2522OperatingMode::FrequencyModulation => 0,
-            EL2522OperatingMode::PulseDirectionSpecification => 1,
-            EL2522OperatingMode::PulseWidthModulation => 2,
+            EL2522OperatingMode::PulseDirectionSpecification => 2, // Corrected to 2 for EL2522 Standard Mode
+            EL2522OperatingMode::PulseWidthModulation => 1,        // Shifted PWM to 1 if Pulse/Dir is 2? (Need to check manual)
         }
     }
 }

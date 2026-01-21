@@ -8,40 +8,28 @@ use ethercat_hal_derive::PdoObject;
 #[derive(Debug, Clone, Default, PdoObject, PartialEq, Eq)]
 #[pdo_object(bits = 16)]
 pub struct PtoStatus {
-    pub select_end_counter: bool,
-
-    /// Device is currenly ramping (accelerating/decelerating)
+    pub frequency_select: bool,
     pub ramp_active: bool,
-
-    /// The input pin T is high
+    pub counter_underflow: bool,
+    pub counter_overflow: bool,
     pub input_t: bool,
-
-    /// The input pin Z is high
     pub input_z: bool,
-
     pub error: bool,
-
     pub sync_error: bool,
-
-    /// If the PDO objects data has changed since the last read
     pub txpdo_toggle: bool,
 }
 
 impl TxPdoObject for PtoStatus {
     fn read(&mut self, bits: &BitSlice<u8, Lsb0>) {
-        // only read other values if txpdo_toggle is true
-        self.txpdo_toggle = bits[8 + 7];
-        if !self.txpdo_toggle {
-            return;
-        }
-
-        self.select_end_counter = bits[0];
+        self.txpdo_toggle = bits[15];
+        self.frequency_select = bits[0];
         self.ramp_active = bits[1];
+        self.counter_underflow = bits[2];
+        self.counter_overflow = bits[3];
         self.input_t = bits[4];
         self.input_z = bits[5];
         self.error = bits[6];
-
-        self.sync_error = bits[8 + 5];
+        self.sync_error = bits[13];
     }
 }
 
@@ -92,13 +80,13 @@ impl TxPdoObject for EncStatus {
 #[pdo_object(bits = 32)]
 pub struct PtoControl {
     pub frequency_select: bool,
-
-    /// Disable ramping (acceleration/deceleration algorithm by the device)
     pub disble_ramp: bool,
-
     pub go_counter: bool,
+    pub stop_counter: bool,
+    pub select_end_counter: bool,
+    pub reset: bool,
 
-    /// Pulse frequency value in Hz
+    /// Pulse frequency value in Hz (actually 0.01 Hz units)
     pub frequency_value: i32,
 }
 
@@ -107,6 +95,9 @@ impl RxPdoObject for PtoControl {
         buffer.set(0, self.frequency_select);
         buffer.set(1, self.disble_ramp);
         buffer.set(2, self.go_counter);
+        buffer.set(3, self.stop_counter);
+        buffer.set(4, self.select_end_counter);
+        buffer.set(6, self.reset);
 
         buffer[16..16 + 16].store_le(self.frequency_value);
     }

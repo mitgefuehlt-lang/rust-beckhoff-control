@@ -1,5 +1,5 @@
-use crate::test_machine::api::TestMachineNamespace;
 use crate::test_machine::TestMachine;
+use crate::test_machine::api::TestMachineNamespace;
 use smol::block_on;
 use std::time::Instant;
 

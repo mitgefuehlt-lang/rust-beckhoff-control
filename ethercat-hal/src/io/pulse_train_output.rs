@@ -81,29 +81,33 @@ pub struct PulseTrainOutputState {
 
 #[derive(Debug, Clone)]
 pub struct PulseTrainOutputInput {
-    pub frequency_select: bool,
+    pub select_ack: bool,
     pub ramp_active: bool,
+    pub set_counter_done: bool,
+    pub counter_underflow: bool,
+    pub counter_overflow: bool,
     pub input_t: bool,
     pub input_z: bool,
     pub error: bool,
     pub sync_error: bool,
-    pub counter_underflow: bool,
-    pub counter_overflow: bool,
+    pub txpdo_state: bool,
+    pub txpdo_toggle: bool,
     pub counter_value: u32,
-    pub set_counter_done: bool,
 }
 
 #[derive(Debug, Clone)]
 pub struct PulseTrainOutputOutput {
-    pub disble_ramp: bool,
+    pub disable_ramp: bool,
     pub frequency_select: bool,
     pub go_counter: bool,
     pub stop_counter: bool,
+    pub set_counter: bool,
+    pub reset_counter: bool,
     pub select_end_counter: bool,
     pub reset: bool,
+    pub control_toggle: bool,
     pub frequency_value: i32,
     pub target_counter_value: u32,
-    pub set_counter: bool,
     pub set_counter_value: u32,
 }
 

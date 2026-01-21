@@ -70,12 +70,14 @@ impl MachineAct for TestMachine {
                     PulseTrainOutputOutput {
                         frequency_value: motor_frequency_pdo,
                         target_counter_value: motor_target_pulses,
-                        disble_ramp: false,
+                        disable_ramp: false,
                         frequency_select: true,
                         go_counter: self.motor_running,
                         stop_counter: false,
+                        reset_counter: false,
                         reset: false,
                         select_end_counter: false,
+                        control_toggle: (now.as_micros() / 100000) % 2 == 0, // Toggle every 100ms
                         set_counter: set_counter_trigger,
                         set_counter_value: 0,
                     },

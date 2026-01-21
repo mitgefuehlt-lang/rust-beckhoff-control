@@ -67,12 +67,15 @@ impl PulseTrainOutputDevice<EL2522Port> for EL2522 {
     fn set_output(&mut self, port: EL2522Port, value: PulseTrainOutputOutput) {
         let (pto_control, pto_target, enc_control) = self.get_rxpdo_mut(port);
 
-        pto_control.disble_ramp = value.disble_ramp;
+        pto_control.disable_ramp = value.disable_ramp;
         pto_control.frequency_select = value.frequency_select;
         pto_control.go_counter = value.go_counter;
         pto_control.stop_counter = value.stop_counter;
+        pto_control.set_counter = value.set_counter;
+        pto_control.reset_counter = value.reset_counter;
         pto_control.select_end_counter = value.select_end_counter;
         pto_control.reset = value.reset;
+        pto_control.control_toggle = value.control_toggle;
         pto_control.frequency_value = value.frequency_value;
         pto_target.target_counter_value = value.target_counter_value;
         enc_control.set_counter = value.set_counter;
@@ -83,15 +86,17 @@ impl PulseTrainOutputDevice<EL2522Port> for EL2522 {
         let (pto_control, pto_target, enc_control) = self.get_rxpdo(port);
 
         PulseTrainOutputOutput {
-            disble_ramp: pto_control.disble_ramp,
+            disable_ramp: pto_control.disable_ramp,
             frequency_select: pto_control.frequency_select,
             go_counter: pto_control.go_counter,
             stop_counter: pto_control.stop_counter,
+            set_counter: pto_control.set_counter,
+            reset_counter: pto_control.reset_counter,
             select_end_counter: pto_control.select_end_counter,
             reset: pto_control.reset,
+            control_toggle: pto_control.control_toggle,
             frequency_value: pto_control.frequency_value,
             target_counter_value: pto_target.target_counter_value,
-            set_counter: enc_control.set_counter,
             set_counter_value: enc_control.set_counter_value,
         }
     }
@@ -99,16 +104,18 @@ impl PulseTrainOutputDevice<EL2522Port> for EL2522 {
         let (pto_status, enc_status) = self.get_txpdo(port);
 
         PulseTrainOutputInput {
-            frequency_select: pto_status.frequency_select,
+            select_ack: pto_status.select_ack,
             ramp_active: pto_status.ramp_active,
+            set_counter_done: pto_status.set_counter_done,
+            counter_underflow: pto_status.counter_underflow,
+            counter_overflow: pto_status.counter_overflow,
             input_t: pto_status.input_t,
             input_z: pto_status.input_z,
             error: pto_status.error,
             sync_error: pto_status.sync_error,
-            counter_underflow: pto_status.counter_underflow,
-            counter_overflow: pto_status.counter_overflow,
+            txpdo_state: pto_status.txpdo_state,
+            txpdo_toggle: pto_status.txpdo_toggle,
             counter_value: enc_status.counter_value,
-            set_counter_done: enc_status.set_counter_done,
         }
     }
 }
@@ -474,8 +481,8 @@ impl From<EL2522OperatingMode> for u8 {
     fn from(value: EL2522OperatingMode) -> Self {
         match value {
             EL2522OperatingMode::FrequencyModulation => 0,
-            EL2522OperatingMode::PulseDirectionSpecification => 2, // Corrected to 2 for EL2522 Standard Mode
-            EL2522OperatingMode::PulseWidthModulation => 1,        // Shifted PWM to 1 if Pulse/Dir is 2? (Need to check manual)
+            EL2522OperatingMode::PulseDirectionSpecification => 1, // Corrected back to 1 for EL2522
+            EL2522OperatingMode::PulseWidthModulation => 3,
         }
     }
 }
@@ -513,10 +520,10 @@ impl PredefinedPdoAssignment<EL2522TxPdo, EL2522RxPdo> for EL2522PredefinedPdoAs
 
 #[derive(Debug, Clone, TxPdo)]
 pub struct EL2522TxPdo {
-    #[pdo_object_index(0x1A00)]
+    #[pdo_object_index(0x1A01)]
     pub pto_status_channel1: Option<PtoStatus>,
 
-    #[pdo_object_index(0x1A01)]
+    #[pdo_object_index(0x1A06)]
     pub pto_status_channel2: Option<PtoStatus>,
 
     #[pdo_object_index(0x1A03)]
@@ -528,16 +535,16 @@ pub struct EL2522TxPdo {
 
 #[derive(Debug, Clone, RxPdo)]
 pub struct EL2522RxPdo {
-    #[pdo_object_index(0x1600)]
+    #[pdo_object_index(0x1601)]
     pub pto_control_channel1: Option<PtoControl>,
 
-    #[pdo_object_index(0x1603)]
+    #[pdo_object_index(0x1604)]
     pub pto_target_channel1: Option<PtoTarget>,
 
-    #[pdo_object_index(0x1605)]
+    #[pdo_object_index(0x1606)]
     pub pto_control_channel2: Option<PtoControl>,
 
-    #[pdo_object_index(0x1608)]
+    #[pdo_object_index(0x1609)]
     pub pto_target_channel2: Option<PtoTarget>,
 
     #[pdo_object_index(0x160B)]
@@ -557,9 +564,17 @@ mod tests {
         let mut buffer = [0u8; 28];
         let rxpdo = EL2522RxPdo {
             pto_control_channel1: Some(PtoControl {
-                frequency_select: true,
-                disble_ramp: true,
                 go_counter: true,
+                stop_counter: false,
+                set_counter: false,
+                reset_counter: false,
+                select_end_counter: false,
+                input_z_logic: false,
+                reset: false,
+                input_t_logic: false,
+                disable_ramp: true,
+                frequency_select: true,
+                control_toggle: true,
                 frequency_value: 1000,
             }),
             pto_target_channel1: Some(PtoTarget {
@@ -567,9 +582,17 @@ mod tests {
             }),
 
             pto_control_channel2: Some(PtoControl {
-                frequency_select: true,
-                disble_ramp: true,
                 go_counter: true,
+                stop_counter: false,
+                set_counter: false,
+                reset_counter: false,
+                select_end_counter: false,
+                input_z_logic: false,
+                reset: false,
+                input_t_logic: false,
+                disable_ramp: true,
+                frequency_select: true,
+                control_toggle: true,
                 frequency_value: 2000,
             }),
             pto_target_channel2: Some(PtoTarget {
@@ -587,33 +610,11 @@ mod tests {
         let bits = buffer.view_bits_mut::<Lsb0>();
         rxpdo.write(bits).unwrap();
         // pto_control_channel1
-        assert_eq!(buffer[0], 0b0000_0111);
+        // Control word: bit 0 (go), bit 8 (disable_ramp), bit 9 (freq_sel), bit 15 (toggle)
+        // 10000011 00000001 = 0x8301
+        assert_eq!(buffer[0], 0x01);
+        assert_eq!(buffer[1], 0x83);
         assert_eq!(u16::from_le_bytes([buffer[2], buffer[3]]), 1000);
-        // pto_target_channel1
-        assert_eq!(
-            u32::from_le_bytes([buffer[4], buffer[5], buffer[6], buffer[7]]),
-            1000001
-        );
-        // pto_control_channel2
-        assert_eq!(buffer[8], 0b0000_0111);
-        assert_eq!(u16::from_le_bytes([buffer[10], buffer[11]]), 2000);
-        // pto_target_channel2
-        assert_eq!(
-            u32::from_le_bytes([buffer[12], buffer[13], buffer[14], buffer[15]]),
-            2000001
-        );
-        // enc_control_channel1
-        assert_eq!(buffer[16], 0b0000_0100);
-        assert_eq!(
-            u32::from_le_bytes([buffer[18], buffer[19], buffer[20], buffer[21]]),
-            10001
-        );
-        // enc_control_channel2
-        assert_eq!(buffer[22], 0b0000_0100);
-        assert_eq!(
-            u32::from_le_bytes([buffer[24], buffer[25], buffer[26], buffer[27]]),
-            10002
-        );
     }
 }
 

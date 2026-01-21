@@ -8,28 +8,32 @@ use ethercat_hal_derive::PdoObject;
 #[derive(Debug, Clone, Default, PdoObject, PartialEq, Eq)]
 #[pdo_object(bits = 16)]
 pub struct PtoStatus {
-    pub frequency_select: bool,
+    pub select_ack: bool,
     pub ramp_active: bool,
+    pub set_counter_done: bool,
     pub counter_underflow: bool,
     pub counter_overflow: bool,
     pub input_t: bool,
     pub input_z: bool,
     pub error: bool,
     pub sync_error: bool,
+    pub txpdo_state: bool,
     pub txpdo_toggle: bool,
 }
 
 impl TxPdoObject for PtoStatus {
     fn read(&mut self, bits: &BitSlice<u8, Lsb0>) {
-        self.txpdo_toggle = bits[15];
-        self.frequency_select = bits[0];
+        self.select_ack = bits[0];
         self.ramp_active = bits[1];
-        self.counter_underflow = bits[2];
-        self.counter_overflow = bits[3];
-        self.input_t = bits[4];
-        self.input_z = bits[5];
-        self.error = bits[6];
+        self.set_counter_done = bits[2];
+        self.counter_underflow = bits[3];
+        self.counter_overflow = bits[4];
+        self.input_t = bits[5];
+        self.input_z = bits[6];
+        self.error = bits[7];
         self.sync_error = bits[13];
+        self.txpdo_state = bits[14];
+        self.txpdo_toggle = bits[15];
     }
 }
 
@@ -79,12 +83,17 @@ impl TxPdoObject for EncStatus {
 #[derive(Debug, Clone, Default, PdoObject)]
 #[pdo_object(bits = 32)]
 pub struct PtoControl {
-    pub frequency_select: bool,
-    pub disble_ramp: bool,
     pub go_counter: bool,
     pub stop_counter: bool,
+    pub set_counter: bool,
+    pub reset_counter: bool,
     pub select_end_counter: bool,
+    pub input_z_logic: bool,
     pub reset: bool,
+    pub input_t_logic: bool,
+    pub disable_ramp: bool,
+    pub frequency_select: bool,
+    pub control_toggle: bool,
 
     /// Pulse frequency value in Hz (actually 0.01 Hz units)
     pub frequency_value: i32,
@@ -92,12 +101,17 @@ pub struct PtoControl {
 
 impl RxPdoObject for PtoControl {
     fn write(&self, buffer: &mut BitSlice<u8, Lsb0>) {
-        buffer.set(0, self.frequency_select);
-        buffer.set(1, self.disble_ramp);
-        buffer.set(2, self.go_counter);
-        buffer.set(3, self.stop_counter);
+        buffer.set(0, self.go_counter);
+        buffer.set(1, self.stop_counter);
+        buffer.set(2, self.set_counter);
+        buffer.set(3, self.reset_counter);
         buffer.set(4, self.select_end_counter);
+        buffer.set(5, self.input_z_logic);
         buffer.set(6, self.reset);
+        buffer.set(7, self.input_t_logic);
+        buffer.set(8, self.disable_ramp);
+        buffer.set(9, self.frequency_select);
+        buffer.set(15, self.control_toggle);
 
         buffer[16..16 + 16].store_le(self.frequency_value);
     }

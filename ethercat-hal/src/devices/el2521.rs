@@ -47,12 +47,15 @@ impl NewEthercatDevice for EL2521 {
 
 impl PulseTrainOutputDevice<EL2521Port> for EL2521 {
     fn set_output(&mut self, _port: EL2521Port, value: PulseTrainOutputOutput) {
-        self.rxpdo.pto_control.as_mut().unwrap().disble_ramp = value.disble_ramp;
+        self.rxpdo.pto_control.as_mut().unwrap().disable_ramp = value.disable_ramp;
         self.rxpdo.pto_control.as_mut().unwrap().frequency_select = value.frequency_select;
         self.rxpdo.pto_control.as_mut().unwrap().go_counter = value.go_counter;
         self.rxpdo.pto_control.as_mut().unwrap().stop_counter = value.stop_counter;
+        self.rxpdo.pto_control.as_mut().unwrap().set_counter = value.set_counter;
+        self.rxpdo.pto_control.as_mut().unwrap().reset_counter = value.reset_counter;
         self.rxpdo.pto_control.as_mut().unwrap().select_end_counter = value.select_end_counter;
         self.rxpdo.pto_control.as_mut().unwrap().reset = value.reset;
+        self.rxpdo.pto_control.as_mut().unwrap().control_toggle = value.control_toggle;
         self.rxpdo.pto_control.as_mut().unwrap().frequency_value = value.frequency_value;
         self.rxpdo.pto_target.as_mut().unwrap().target_counter_value = value.target_counter_value;
         self.rxpdo.enc_control.as_mut().unwrap().set_counter = value.set_counter;
@@ -61,31 +64,35 @@ impl PulseTrainOutputDevice<EL2521Port> for EL2521 {
 
     fn get_output(&self, _port: EL2521Port) -> PulseTrainOutputOutput {
         PulseTrainOutputOutput {
-            disble_ramp: self.rxpdo.pto_control.as_ref().unwrap().disble_ramp,
+            disable_ramp: self.rxpdo.pto_control.as_ref().unwrap().disable_ramp,
             frequency_select: self.rxpdo.pto_control.as_ref().unwrap().frequency_select,
             go_counter: self.rxpdo.pto_control.as_ref().unwrap().go_counter,
             stop_counter: self.rxpdo.pto_control.as_ref().unwrap().stop_counter,
+            set_counter: self.rxpdo.pto_control.as_ref().unwrap().set_counter,
+            reset_counter: self.rxpdo.pto_control.as_ref().unwrap().reset_counter,
             select_end_counter: self.rxpdo.pto_control.as_ref().unwrap().select_end_counter,
             reset: self.rxpdo.pto_control.as_ref().unwrap().reset,
+            control_toggle: self.rxpdo.pto_control.as_ref().unwrap().control_toggle,
             frequency_value: self.rxpdo.pto_control.as_ref().unwrap().frequency_value,
             target_counter_value: self.rxpdo.pto_target.as_ref().unwrap().target_counter_value,
-            set_counter: self.rxpdo.enc_control.as_ref().unwrap().set_counter,
             set_counter_value: self.rxpdo.enc_control.as_ref().unwrap().set_counter_value,
         }
     }
 
     fn get_input(&self, _port: EL2521Port) -> PulseTrainOutputInput {
         PulseTrainOutputInput {
-            frequency_select: self.txpdo.pto_status.as_ref().unwrap().frequency_select,
+            select_ack: self.txpdo.pto_status.as_ref().unwrap().select_ack,
             ramp_active: self.txpdo.pto_status.as_ref().unwrap().ramp_active,
+            set_counter_done: self.txpdo.pto_status.as_ref().unwrap().set_counter_done,
+            counter_underflow: self.txpdo.pto_status.as_ref().unwrap().counter_underflow,
+            counter_overflow: self.txpdo.pto_status.as_ref().unwrap().counter_overflow,
             input_t: self.txpdo.pto_status.as_ref().unwrap().input_t,
             input_z: self.txpdo.pto_status.as_ref().unwrap().input_z,
             error: self.txpdo.pto_status.as_ref().unwrap().error,
             sync_error: self.txpdo.pto_status.as_ref().unwrap().sync_error,
-            counter_underflow: self.txpdo.pto_status.as_ref().unwrap().counter_underflow,
-            counter_overflow: self.txpdo.pto_status.as_ref().unwrap().counter_overflow,
+            txpdo_state: self.txpdo.pto_status.as_ref().unwrap().txpdo_state,
+            txpdo_toggle: self.txpdo.pto_status.as_ref().unwrap().txpdo_toggle,
             counter_value: self.txpdo.enc_status.as_ref().unwrap().counter_value,
-            set_counter_done: self.txpdo.enc_status.as_ref().unwrap().set_counter_done,
         }
     }
 }
@@ -413,9 +420,17 @@ mod tests {
         let mut buffer = [0u8; 14];
         let rxpdo = EL2521RxPdo {
             pto_control: Some(PtoControl {
-                frequency_select: true,
-                disble_ramp: true,
                 go_counter: true,
+                stop_counter: false,
+                set_counter: false,
+                reset_counter: false,
+                select_end_counter: false,
+                input_z_logic: false,
+                reset: false,
+                input_t_logic: false,
+                disable_ramp: true,
+                frequency_select: true,
+                control_toggle: true,
                 frequency_value: 1000,
             }),
             pto_target: Some(PtoTarget {
@@ -428,17 +443,9 @@ mod tests {
         };
         let bits = buffer.view_bits_mut::<Lsb0>();
         rxpdo.write(bits).unwrap();
-        assert_eq!(buffer[0], 0b0000_0111);
+        assert_eq!(buffer[0], 0x01);
+        assert_eq!(buffer[1], 0x83);
         assert_eq!(u16::from_le_bytes([buffer[2], buffer[3]]), 1000);
-        assert_eq!(
-            u32::from_le_bytes([buffer[4], buffer[5], buffer[6], buffer[7]]),
-            1000000
-        );
-        assert_eq!(buffer[8], 0b0000_0100);
-        assert_eq!(
-            u32::from_le_bytes([buffer[10], buffer[11], buffer[12], buffer[13]]),
-            1000000
-        );
     }
 }
 

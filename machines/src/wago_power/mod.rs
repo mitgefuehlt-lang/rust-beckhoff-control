@@ -1,27 +1,16 @@
 use crate::{MachineChannel, MachineWithChannel};
 use anyhow::Result;
-use control_core::{
-    modbus::tcp::ModbusTcpDevice,
-    socketio::{
-        event::{BuildEvent, GenericEvent},
-        namespace::{
-            CacheFn, CacheableEvents, NamespaceCacheingLogic, cache_duration,
-            cache_first_and_last_event,
-        },
+use control_core::socketio::{
+    event::{BuildEvent, GenericEvent},
+    namespace::{
+        CacheFn, CacheableEvents, NamespaceCacheingLogic, cache_duration,
+        cache_first_and_last_event,
     },
 };
 use control_core_derive::BuildEvent;
 use serde::*;
-use smol::lock::Mutex;
-use std::{
-    net::SocketAddr,
-    time::{Duration, Instant},
-};
-use units::{
-    electric_current::milliampere,
-    electric_potential::{millivolt, volt},
-    *,
-};
+use std::time::{Duration, Instant};
+use units::*;
 
 const MODBUS_DC_OFF: u16 = 0;
 const MODBUS_DC_ON: u16 = 1;

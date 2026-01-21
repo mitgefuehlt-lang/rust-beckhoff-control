@@ -1,5 +1,3 @@
-use crate::pdo::el252x::{EncControl, EncStatus, PtoControl, PtoStatus, PtoTarget};
-
 /// Trait for pulse train output devices
 pub trait PulseTrainOutputDevice<Port> {
     fn set_output(&mut self, port: Port, value: PulseTrainOutputOutput);

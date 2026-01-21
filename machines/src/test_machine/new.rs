@@ -1,5 +1,5 @@
-use crate::test_machine::TestMachine;
 use crate::test_machine::api::TestMachineNamespace;
+use crate::test_machine::TestMachine;
 use smol::block_on;
 use std::time::Instant;
 
@@ -8,6 +8,7 @@ use crate::{
     validate_no_role_dublicates, validate_same_machine_identification_unique,
 };
 
+use anyhow::Error;
 use ethercat_hal::coe::ConfigurableDevice;
 use ethercat_hal::devices::el1008::{EL1008, EL1008_IDENTITY_A, EL1008Port};
 use ethercat_hal::devices::el2008::{EL2008, EL2008_IDENTITY_A, EL2008_IDENTITY_B, EL2008Port};
@@ -29,7 +30,7 @@ use std::sync::Arc;
 impl MachineNewTrait for TestMachine {
     fn new<'maindevice>(params: &MachineNewParams) -> Result<Self, Error> {
         info!("[TestMachine::new] Starting initialization...");
-        
+
         // validate general stuff
         let device_identification = params
             .device_group
@@ -57,6 +58,7 @@ impl MachineNewTrait for TestMachine {
                 get_ethercat_device::<EL1008>(hardware, params, 0, [EL1008_IDENTITY_A].to_vec())
                     .await;
 
+            let el1008 = match el1008_res {
                 Ok(dev) => {
                     info!("[TestMachine::new] Successfully acquired EL1008");
                     dev.0
@@ -86,6 +88,7 @@ impl MachineNewTrait for TestMachine {
             )
             .await;
 
+            let el2008 = match el2008_res {
                 Ok(dev) => {
                     info!("[TestMachine::new] Successfully acquired EL2008");
                     dev.0
@@ -110,6 +113,7 @@ impl MachineNewTrait for TestMachine {
                 get_ethercat_device::<EL2522>(hardware, params, 2, [EL2522_IDENTITY_A].to_vec())
                     .await;
 
+            let (el2522, subdevice) = match el2522_res {
                 Ok(dev) => {
                     info!("[TestMachine::new] Successfully acquired EL2522");
                     (dev.0, dev.1)

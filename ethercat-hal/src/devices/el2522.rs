@@ -68,6 +68,7 @@ impl PulseTrainOutputDevice<EL2522Port> for EL2522 {
         let (pto_control, pto_target, enc_control) = self.get_rxpdo_mut(port);
 
         pto_control.disble_ramp = value.disble_ramp;
+        pto_control.go_counter = value.go_counter;
         pto_control.frequency_value = value.frequency_value;
         pto_target.target_counter_value = value.target_counter_value;
         enc_control.set_counter = value.set_counter;

@@ -11,7 +11,7 @@ use crate::{
 
 use anyhow::Error;
 use ethercat_hal::devices::el2522::{
-    EL2522, EL2522Configuration, EL2522IDENTITY_A, EL2522OperatingMode,
+    EL2522, EL2522Configuration, EL2522_IDENTITY_A, EL2522OperatingMode,
 };
 use ethercat_hal::devices::el2008::{EL2008, EL2008_IDENTITY_A, EL2008_IDENTITY_B, EL2008Port};
 use ethercat_hal::devices::el1008::{EL1008, EL1008_IDENTITY_A, EL1008Port};
@@ -104,10 +104,10 @@ impl MachineNewTrait for TestMachine {
             info!("[TestMachine::new] Acquiring EL2522 (Role 2)...");
             let el2522_res = get_ethercat_device::<EL2522>(hardware, params, 2, [EL2522_IDENTITY_A].to_vec()).await;
             
-            let el2522 = match el2522_res {
+            let (el2522, subdevice) = match el2522_res {
                 Ok(dev) => {
                     info!("[TestMachine::new] Successfully acquired EL2522");
-                    dev.0
+                    (dev.0, dev.1)
                 },
                 Err(e) => {
                     tracing::error!("[TestMachine::new] Failed to acquire EL2522: {:?}", e);

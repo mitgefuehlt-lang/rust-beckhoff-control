@@ -32,6 +32,45 @@ impl MachineAct for TestMachine {
                     self.last_button_state = val;
                 }
             }
+                }
+            }
+        }
+
+        // --- Motor Control Logic (Runs every cycle) ---
+        // Conversion: 200 pulses/rev, 10mm/rev -> 20 pulses per mm
+        let target_pulses = (self.motor_target_mm * 20.0) as u32;
+        let frequency_hz = (self.motor_speed_mm_s * 20.0) as i32;
+
+        let mut pto = smol::block_on(self.pto.write());
+        let current_output = pto.get_output(EL2522Port::PTO2);
+
+        // Reset counter to 0 on motor start (rising edge of motor_running)
+        let mut set_counter = false;
+        if self.motor_running && !self.motor_was_running {
+            set_counter = true;
+            tracing::info!("[TestMachine] Motor Start: Resetting counter to 0, target: {} pulses", target_pulses);
+        }
+        self.motor_was_running = self.motor_running;
+
+        // Only update if target, frequency, go_counter or set_counter state changed
+        if current_output.target_counter_value != target_pulses
+            || current_output.frequency_value != frequency_hz
+            || current_output.go_counter != self.motor_running
+            || set_counter
+        {
+            pto.set_output(
+                EL2522Port::PTO2,
+                PulseTrainOutputOutput {
+                    frequency_value: frequency_hz,
+                    target_counter_value: target_pulses,
+                    disble_ramp: false,
+                    frequency_select: true,
+                    go_counter: self.motor_running,
+                    set_counter,
+                    set_counter_value: 0,
+                    ..current_output
+                },
+            );
         }
 
         if now.duration_since(self.last_state_emit) > Duration::from_secs_f64(1.0 / 30.0) {
@@ -57,31 +96,6 @@ impl MachineAct for TestMachine {
             MachineMessage::DisconnectMachine(_machine_connection) => {
                 // Does not connect to any Machine; do nothing
             }
-        }
-
-        // Conversion: 200 pulses/rev, 10mm/rev -> 20 pulses per mm
-        let target_pulses = (self.motor_target_mm * 20.0) as u32;
-        let frequency_hz = (self.motor_speed_mm_s * 20.0) as i32;
-
-        let mut pto = smol::block_on(self.pto.write());
-        let current_output = pto.get_output(EL2522Port::PTO2);
-
-        // Only update if target, frequency or go_counter state changed
-        if current_output.target_counter_value != target_pulses
-            || current_output.frequency_value != frequency_hz
-            || current_output.go_counter != self.motor_running
-        {
-            pto.set_output(
-                EL2522Port::PTO2,
-                PulseTrainOutputOutput {
-                    frequency_value: frequency_hz,
-                    target_counter_value: target_pulses,
-                    disble_ramp: false, // Enable ramping for smoother movement
-                    frequency_select: true, // Tell the EL2522 to use our frequency!
-                    go_counter: self.motor_running, // Use motor_running to trigger movement
-                    ..current_output
-                },
-            );
         }
     }
 }

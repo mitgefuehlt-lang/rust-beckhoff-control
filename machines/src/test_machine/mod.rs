@@ -36,6 +36,7 @@ pub struct TestMachine {
     pub motor_target_mm: f64,
     pub motor_speed_mm_s: f64,
     pub motor_running: bool,
+    pub motor_was_running: bool,
     pub last_button_state: bool,
 }
 

@@ -149,6 +149,7 @@ impl MachineNewTrait for TestMachine {
                 motor_target_mm: 0.0,
                 motor_speed_mm_s: 0.0,
                 motor_running: false,
+                motor_was_running: false,
                 last_button_state: false,
             };
             my_test.emit_state();

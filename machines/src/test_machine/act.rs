@@ -17,6 +17,7 @@ impl MachineAct for TestMachine {
                 self.led_on[i] = val;
 
                 // --- Button Logic (Input 0) ---
+                // Motor logic update for physical trigger
                 if i == 0 {
                     if val && !self.last_button_state {
                         // Rising Edge detected

@@ -8,3 +8,15 @@ shell.nix
 node_modules/
 runtime_metrics.csv
 compile_metrics.csv
+
+# Keys and Secrets
+key_*
+*.pub
+*.bat
+!gen_key.bat
+!install_key.bat
+# Wait, let's just be broad
+key_v3
+key_v3.pub
+gen_key.bat
+install_key.bat

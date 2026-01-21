@@ -37,8 +37,9 @@ export function SidebarItem({
       className={`relative h-18 w-full ${isActive ? "pl-2" : "px-2"}`}
     >
       <div
-        className={`text-md relative z-10 flex h-full w-full items-center justify-center gap-2 ${isActive ? "rounded-l-lg bg-white pr-2" : "rounded-lg bg-neutral-100"
-          }`}
+        className={`text-md relative z-10 flex h-full w-full items-center justify-center gap-2 ${
+          isActive ? "rounded-l-lg bg-white pr-2" : "rounded-lg bg-neutral-100"
+        }`}
       >
         {icon && <Icon name={icon} />}
         {title}

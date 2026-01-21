@@ -308,9 +308,11 @@ pub async fn setup_loop(
                      0
                  } else if name == "EL2008" {
                      1
+                 } else if name == "EL2522" {
+                     2
                  } else {
-                     // EK1100 or others
-                     99
+                     // EK1100 or others - use index + 100 to ensure uniqueness
+                     100 + (i as u16)
                  };
 
                  id_opt = Some(machines::machine_identification::DeviceMachineIdentification {

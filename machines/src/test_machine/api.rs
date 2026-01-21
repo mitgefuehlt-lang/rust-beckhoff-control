@@ -13,6 +13,12 @@ use std::sync::Arc;
 #[derive(Serialize, Debug, Clone)]
 pub struct StateEvent {
     pub led_on: [bool; 8],
+    pub motor_running: bool,
+    pub motor_pos: u32,
+    pub motor_target: u32,
+    pub motor_freq: i32,
+    pub motor_error: bool,
+    pub motor_ramp_active: bool,
 }
 
 impl StateEvent {

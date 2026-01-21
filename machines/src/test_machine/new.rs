@@ -119,6 +119,7 @@ impl MachineNewTrait for TestMachine {
             let el2522_config = EL2522Configuration {
                 channel2_configuration: ethercat_hal::devices::el2522::EL2522ChannelConfiguration {
                     operating_mode: EL2522OperatingMode::PulseDirectionSpecification,
+                    travel_distance_control: true, // CRITICAL: Enable for Go counter to work
                     ..Default::default()
                 },
                 ..Default::default()
@@ -152,6 +153,9 @@ impl MachineNewTrait for TestMachine {
                 motor_was_running: false,
                 last_button_state: false,
                 start_time: Instant::now(),
+                pto_counter_value: 0,
+                pto_error: false,
+                pto_ramp_active: false,
             };
             my_test.emit_state();
             Ok(my_test)

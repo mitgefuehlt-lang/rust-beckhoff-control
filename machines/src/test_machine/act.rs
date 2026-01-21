@@ -83,6 +83,11 @@ impl MachineAct for TestMachine {
                     },
                 );
             }
+
+            // Cache PTO status for HMI
+            self.pto_counter_value = current_input.counter_value;
+            self.pto_error = current_input.error;
+            self.pto_ramp_active = current_input.ramp_active;
         }
 
         if now.duration_since(self.last_state_emit) > Duration::from_secs_f64(1.0 / 30.0) {

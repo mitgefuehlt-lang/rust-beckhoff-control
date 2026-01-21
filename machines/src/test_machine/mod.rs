@@ -39,6 +39,10 @@ pub struct TestMachine {
     pub motor_was_running: bool,
     pub last_button_state: bool,
     pub start_time: Instant,
+    // PTO Status Cache
+    pub pto_counter_value: u32,
+    pub pto_error: bool,
+    pub pto_ramp_active: bool,
 }
 
 impl Machine for TestMachine {
@@ -61,6 +65,12 @@ impl TestMachine {
     pub fn emit_state(&mut self) {
         let event = StateEvent {
             led_on: self.led_on,
+            motor_running: self.motor_running,
+            motor_pos: self.pto_counter_value,
+            motor_target: (self.motor_target_mm * 20.0) as u32,
+            motor_freq: (self.motor_speed_mm_s * 20.0 * 100.0) as i32,
+            motor_error: self.pto_error,
+            motor_ramp_active: self.pto_ramp_active,
         }
         .build();
 

@@ -12,7 +12,7 @@ The content of the EC Declaration of Conformity corresponds to Annex II, No. 1 A
 
 **Manufacturer of the machine:**
 
-QiTech Industries GmbH
+Kailar
 
 Landwehrsrtaße 55
 
@@ -32,9 +32,9 @@ Landwehrsrtaße 55
 | General designation | Filament winding machine |
 | ------------------- | ---------------------------------- |
 | function | Winding and rewinding of filaments |
-| Model | QiTech Winder |
+| Model | Kailar Winder |
 | type | Filament winding machine |
-| Trade name | QiTech Winder |
+| Trade name | Kailar Winder |
 <br><br>
 
 We hereby declare that the above-mentioned machine is in conformity with all relevant provisions of the EC Machinery Directive 2006/42/EC. The machine is also in compliance with all relevant provisions of the following EC Directives:
@@ -63,9 +63,9 @@ Milan von dem Bussche
 
 # Operating instructions based on DIN EN ISO 20607
 
-| Designation   | QiTech Winder                     |
+| Designation   | Kailar Winder                     |
 | ------------- | --------------------------------- |
-| Manufacturer  | QiTech Industries GmbH            |
+| Manufacturer  | Kailar                            |
 | Administrator | Milan von dem Bussche             |
 | Address       | Landwehrstraße 55 64293 Darmstadt |
 
@@ -93,7 +93,7 @@ ATTENTION: Before using the machine for the first time, please inform yourself a
 
 <br>
 
-Reproduction and reprinting in any form, even in extracts, requires the written authorization of QiTech Industries.
+Reproduction and reprinting in any form, even in extracts, requires the written authorization of Kailar.
 
 Operating instructions
 
@@ -186,7 +186,7 @@ Accuracy class: 2
 
 | Picture                                     | Danger!                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
 | ------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| ![Warning](images/manuals/winder/w001.jpeg) | **Danger to life due to technically faulty machine.** <br> The machine may only be used when it is in perfect technical condition and in accordance with its intended use, in a safety-conscious and hazard-conscious manner and in compliance with these operating instructions. All faults, especially those that could impair safety, must be rectified immediately before starting the winder. Everyone who works on or with the Qitech Winder is responsible for observing these safety aspects! |
+| ![Warning](images/manuals/winder/w001.jpeg) | **Danger to life due to technically faulty machine.** <br> The machine may only be used when it is in perfect technical condition and in accordance with its intended use, in a safety-conscious and hazard-conscious manner and in compliance with these operating instructions. All faults, especially those that could impair safety, must be rectified immediately before starting the winder. Everyone who works on or with the Kailar machine is responsible for observing these safety aspects! |
 
 <br><br><br>
 
@@ -226,7 +226,7 @@ Accuracy class: 2
 
 # 1.4 Intended use
 
-The QiTech Winder is designed for winding and rewinding filaments between 1 mm and 3 mm.
+The Kailar Winder is designed for winding and rewinding filaments between 1 mm and 3 mm.
 The winder must be placed on a stable, level surface and secured if necessary. The test and work sequence is described in chapter 3.4 Work sequence.
 When using the winder, it is essential that the work steps described in the chapter "Work sequence" or in the operating instructions are followed.
 In the event of significant changes or deviations, it is necessary to carry out a new risk assessment in accordance with the Machinery Directive and to document the changes in the corresponding documents.
@@ -358,7 +358,7 @@ The cables must be routed in such a way that they cannot be tripped over.
 
 <br>
 
-**Updating the QiTech Control Software**
+**Updating the Kailar Control Software**
 
 The machines are delivered with the newest version of the software installed. Updates, as well as previous updates and the software version can be viewed under Setup-> Updates. If a new version of the software is available, it will be displayed here. To perform the update an internet connection is required. In the next step, click the red "Select" button next to the chosen update. The display will now shut down, and when it is turned back on, the latest version of the software will be installed.
 
@@ -370,7 +370,7 @@ The machines are delivered with the newest version of the software installed. Up
 
 **Safety Measures**
 
-Some important safety measures must be observed to ensure safe operation of the QiTech Winder:
+Some important safety measures must be observed to ensure safe operation of the Kailar Winder:
 
 - It is important to only use original fuses with the prescribed current ratings to avoid overloading.
 - If inspection, maintenance and repair work is carried out on electrical components, these must be de-energized beforehand. Equipment that has been disconnected must be secured against unintentional or automatic reconnection. First check that there is no voltage and insulate neighboring live components.
@@ -528,7 +528,7 @@ Personnel to be trained, instructed or undergoing general training may only work
 
 **Updating the Winder software**
 
-There are regular updates for the "QiTech Control" software, which may contain bug fixes as well as new functions or security updates. It is therefore recommended that you regularly check if new Updates are available and install them as described in section 2.2.
+There are regular updates for the "Kailar Control" software, which may contain bug fixes as well as new functions or security updates. It is therefore recommended that you regularly check if new Updates are available and install them as described in section 2.2.
 
 <br>
 
@@ -574,10 +574,10 @@ Now remove the black plastic caps and simply pull out the puller rollers. To ins
 
 <br>
 
-**Machine is not recognized by QiTech Control**
+**Machine is not recognized by Kailar Control**
 
 - Is the LAN-cable connected?
-- Is the latest version of QiTech Control installed?
+- Is the latest version of Kailar Control installed?
 
 <br>
 
@@ -716,12 +716,12 @@ The following persons may not work on the machine:
 
 ## Electrical Diagrams
 
-![QiTech Pro Winder Electrical Diagram - Sheet 1](images/manuals/winder/QiTech_Pro_Winder_Electrical_Diagram-001.png)
+![Kailar Pro Winder Electrical Diagram - Sheet 1](images/manuals/winder/QiTech_Pro_Winder_Electrical_Diagram-001.png)
 
-![QiTech Pro Winder Electrical Diagram - Sheet 2](images/manuals/winder/QiTech_Pro_Winder_Electrical_Diagram_2-002.png)
+![Kailar Pro Winder Electrical Diagram - Sheet 2](images/manuals/winder/QiTech_Pro_Winder_Electrical_Diagram_2-002.png)
 
-![QiTech Pro Winder Electrical Diagram - Sheet 3](images/manuals/winder/QiTech_Pro_Winder_Electrical_Diagram_3-003.png)
+![Kailar Pro Winder Electrical Diagram - Sheet 3](images/manuals/winder/QiTech_Pro_Winder_Electrical_Diagram_3-003.png)
 
-![QiTech Pro Winder Electrical Diagram - Sheet 4](images/manuals/winder/QiTech_Pro_Winder_Electrical_Diagram_4-004.png)
+![Kailar Pro Winder Electrical Diagram - Sheet 4](images/manuals/winder/QiTech_Pro_Winder_Electrical_Diagram_4-004.png)
 
-![QiTech Pro Winder Electrical Diagram - Sheet 5](images/manuals/winder/QiTech_Pro_Winder_Electrical_Diagram_5-005.png)
+![Kailar Pro Winder Electrical Diagram - Sheet 5](images/manuals/winder/QiTech_Pro_Winder_Electrical_Diagram_5-005.png)

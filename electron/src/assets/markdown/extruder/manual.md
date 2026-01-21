@@ -12,7 +12,7 @@ The content of the EC Declaration of Conformity corresponds to Annex II, No. 1 A
 
 **Manufacturer of the machine:**
 
-QiTech Industries GmbH
+Kailar
 
 Landwehrsrtaße 55
 
@@ -29,12 +29,12 @@ Landwehrsrtaße 55
 <br><br><br>
 
 **under consideration:**
-| General designation | Extruder |
+| General designation | Schneidemaschine V1 |
 | ------------------- | ---------------------------------- |
 | function | Extruding plastics into filaments
-| Model | QiTech Extruder |
+| Model | Kailar Extruder |
 | type | Plastics extruding machine |
-| Trade name | QiTech Esxruder |
+| Trade name | Kailar Extruder |
 <br><br>
 
 We hereby declare that the above-mentioned machine is in conformity with all relevant provisions of the EC Machinery Directive 2006/42/EC. The machine is also in compliance with all relevant provisions of the following EC Directives:
@@ -63,9 +63,9 @@ Milan von dem Bussche
 
 # Operating instructions based on DIN EN ISO 20607
 
-| Designation   | QiTech Winder                     |
+| Designation   | Kailar Winder                     |
 | ------------- | --------------------------------- |
-| Manufacturer  | QiTech Industries GmbH            |
+| Manufacturer  | Kailar                            |
 | Administrator | Milan von dem Bussche             |
 | Address       | Landwehrstraße 55 64293 Darmstadt |
 
@@ -93,7 +93,7 @@ ATTENTION: Before using the machine for the first time, please inform yourself a
 
 <br>
 
-Reproduction and reprinting in any form, even in extracts, requires the written authorization of QiTech Industries.
+Reproduction and reprinting in any form, even in extracts, requires the written authorization of Kailar.
 
 Operating instructions
 
@@ -168,7 +168,7 @@ Accuracy class: 2
 
 | Picture                                       | Danger!                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
 | --------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| ![Warning](images/manuals/extruder/w001.jpeg) | **Danger to life due to technically faulty machine.** <br> The machine may only be used when it is in perfect technical condition and in accordance with its intended use, in a safety-conscious and hazard-conscious manner and in compliance with these operating instructions. All faults, especially those that could impair safety, must be rectified immediately before starting the winder. Everyone who works on or with the Qitech Winder is responsible for observing these safety aspects! |
+| ![Warning](images/manuals/extruder/w001.jpeg) | **Danger to life due to technically faulty machine.** <br> The machine may only be used when it is in perfect technical condition and in accordance with its intended use, in a safety-conscious and hazard-conscious manner and in compliance with these operating instructions. All faults, especially those that could impair safety, must be rectified immediately before starting the winder. Everyone who works on or with the Kailar machine is responsible for observing these safety aspects! |
 
 <br><br><br>
 
@@ -208,7 +208,7 @@ Accuracy class: 2
 
 ## 1.4 Intended use
 
-The QiTech extruder is intended for melting plastic granulate into plastic filament.
+The Schneidemaschine V1 is intended for melting plastic granulate into plastic filament.
 
 The extruder must be placed on a stable, level surface or a braked trolley and secured if necessary. The test and work sequence is described in chapter 2.3 Work sequence.
 

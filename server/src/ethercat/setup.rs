@@ -275,74 +275,85 @@ pub async fn setup_loop(
     let subdevices = group_preop.iter(&maindevice).collect::<Vec<_>>();
 
     // extract device identifications
-    let device_identifications = read_device_identifications(&subdevices, &maindevice)
-        .await
+    // Use fold to track assigned roles while building the result
+    let results = read_device_identifications(&subdevices, &maindevice).await;
+    
+    let device_identifications: Vec<DeviceIdentification> = results
         .into_iter()
         .zip(&subdevices)
         .enumerate()
-        .map(|(i, (result, subdevice))| {
-            let mut id_opt = result.ok();
+        .fold(
+            (Vec::new(), std::collections::HashSet::<u16>::new()),
+            |(mut identifications, mut assigned_roles), (i, (result, subdevice))| {
+                let mut id_opt = result.ok();
 
-            // Check if ID is missing OR if it is just zeros (unprogrammed)
-            let needs_bypass = match &id_opt {
-                None => true,
-                Some(id) => {
-                    id.machine_identification_unique
-                        .machine_identification
-                        .vendor
-                        == 0
+                // Check if ID is missing OR if it is just zeros (unprogrammed)
+                let needs_bypass = match &id_opt {
+                    None => true,
+                    Some(id) => {
+                        id.machine_identification_unique
+                            .machine_identification
+                            .vendor
+                            == 0
+                    }
+                };
+
+                // BYPASSS FOR EMPTY EEPROM
+                if needs_bypass {
+                    let name = subdevice.name();
+                    tracing::warn!(
+                        "Device {} has no/zero ID, applying BYPASS for TestMachine",
+                        name
+                    );
+
+                    // Default Fake ID for TestMachine
+                    let fake_unique = machines::machine_identification::MachineIdentificationUnique {
+                        machine_identification: machines::machine_identification::MachineIdentification {
+                            vendor: 0x0001,  // VENDOR_QITECH
+                            machine: 0x0033, // TEST_MACHINE
+                        },
+                        serial: 1,
+                    };
+
+                    // Determine role based on device name, ensuring no duplicates
+                    let desired_role = if name == "EL1008" { Some(0u16) }
+                        else if name == "EL2008" { Some(1u16) }
+                        else if name == "EL2522" { Some(2u16) }
+                        else { None };
+
+                    let role = match desired_role {
+                        Some(r) if !assigned_roles.contains(&r) => {
+                            assigned_roles.insert(r);
+                            r
+                        }
+                        _ => {
+                            // EK1100 or duplicate instances - use index + 100 to ensure uniqueness
+                            let fallback = 100 + (i as u16);
+                            assigned_roles.insert(fallback);
+                            fallback
+                        }
+                    };
+
+                    id_opt = Some(
+                        machines::machine_identification::DeviceMachineIdentification {
+                            machine_identification_unique: fake_unique,
+                            role,
+                        },
+                    );
                 }
-            };
+                // END BYPASS
 
-            // BYPASSS FOR EMPTY EEPROM
-            if needs_bypass {
-                let name = subdevice.name();
-                tracing::warn!(
-                    "Device {} has no/zero ID, applying BYPASS for TestMachine",
-                    name
-                );
+                identifications.push(DeviceIdentification {
+                    device_machine_identification: id_opt,
+                    device_hardware_identification: DeviceHardwareIdentification::Ethercat(
+                        DeviceHardwareIdentificationEthercat { subdevice_index: i },
+                    ),
+                });
 
-                // Default Fake ID for TestMachine
-                let fake_machine_id = machines::machine_identification::MachineIdentification {
-                    vendor: 0x0001,  // VENDOR_QITECH
-                    machine: 0x0033, // TEST_MACHINE
-                };
-                let fake_unique = machines::machine_identification::MachineIdentificationUnique {
-                    machine_identification: fake_machine_id,
-                    serial: 1,
-                };
-
-                let role = if name == "EL1008" {
-                    0
-                } else if name == "EL2008" {
-                    1
-                } else if name == "EL2522" {
-                    2
-                } else {
-                    // EK1100 or others - use index + 100 to ensure uniqueness
-                    100 + (i as u16)
-                };
-
-                id_opt = Some(
-                    machines::machine_identification::DeviceMachineIdentification {
-                        machine_identification_unique: fake_unique,
-                        role: role,
-                    },
-                );
-            }
-            // END BYPASS
-
-            (i, id_opt)
-        })
-        .map(
-            |(subdevice_index, device_machine_identification)| DeviceIdentification {
-                device_machine_identification,
-                device_hardware_identification: DeviceHardwareIdentification::Ethercat(
-                    DeviceHardwareIdentificationEthercat { subdevice_index },
-                ),
+                (identifications, assigned_roles)
             },
         )
-        .collect::<Vec<_>>();
+        .0;
     let devices = device_identifications
         .into_iter()
         .zip(devices)

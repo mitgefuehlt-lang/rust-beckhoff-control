@@ -374,6 +374,11 @@ impl EL2522Configuration {
         enc_base_index: u16,
         config: &EL2522ChannelConfiguration,
     ) -> Result<(), anyhow::Error> {
+        // Write operating mode FIRST to avoid parameter incompatibility errors (0x06040043)
+        device
+            .sdo_write(pto_base_index, 0x0E, u8::from(config.operating_mode))
+            .await?;
+
         // Write PTO settings
         device
             .sdo_write(pto_base_index, 0x01, config.adapt_a_b_on_position_set)
@@ -405,9 +410,6 @@ impl EL2522Configuration {
             .await?;
         device
             .sdo_write(pto_base_index, 0x0A, config.travel_distance_control)
-            .await?;
-        device
-            .sdo_write(pto_base_index, 0x0E, u8::from(config.operating_mode))
             .await?;
         device
             .sdo_write(pto_base_index, 0x10, config.negative_logic)

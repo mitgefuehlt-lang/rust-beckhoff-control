@@ -281,48 +281,58 @@ pub async fn setup_loop(
         .zip(&subdevices)
         .enumerate()
         .map(|(i, (result, subdevice))| {
-             let mut id_opt = result.ok();
-             
-             // Check if ID is missing OR if it is just zeros (unprogrammed)
-             let needs_bypass = match &id_opt {
-                 None => true,
-                 Some(id) => id.machine_identification_unique.machine_identification.vendor == 0
-             };
+            let mut id_opt = result.ok();
 
-             // BYPASSS FOR EMPTY EEPROM
-             if needs_bypass {
-                 let name = subdevice.name();
-                 tracing::warn!("Device {} has no/zero ID, applying BYPASS for TestMachine", name);
-                 
-                 // Default Fake ID for TestMachine
-                 let fake_machine_id = machines::machine_identification::MachineIdentification {
-                     vendor: 0x0001, // VENDOR_QITECH
-                     machine: 0x0033, // TEST_MACHINE
-                 };
-                 let fake_unique = machines::machine_identification::MachineIdentificationUnique {
-                     machine_identification: fake_machine_id,
-                     serial: 1,
-                 };
-                 
-                 let role = if name == "EL1008" {
-                     0
-                 } else if name == "EL2008" {
-                     1
-                 } else if name == "EL2522" {
-                     2
-                 } else {
-                     // EK1100 or others - use index + 100 to ensure uniqueness
-                     100 + (i as u16)
-                 };
+            // Check if ID is missing OR if it is just zeros (unprogrammed)
+            let needs_bypass = match &id_opt {
+                None => true,
+                Some(id) => {
+                    id.machine_identification_unique
+                        .machine_identification
+                        .vendor
+                        == 0
+                }
+            };
 
-                 id_opt = Some(machines::machine_identification::DeviceMachineIdentification {
-                     machine_identification_unique: fake_unique,
-                     role: role,
-                 });
-             }
-             // END BYPASS
+            // BYPASSS FOR EMPTY EEPROM
+            if needs_bypass {
+                let name = subdevice.name();
+                tracing::warn!(
+                    "Device {} has no/zero ID, applying BYPASS for TestMachine",
+                    name
+                );
 
-             (i, id_opt)
+                // Default Fake ID for TestMachine
+                let fake_machine_id = machines::machine_identification::MachineIdentification {
+                    vendor: 0x0001,  // VENDOR_QITECH
+                    machine: 0x0033, // TEST_MACHINE
+                };
+                let fake_unique = machines::machine_identification::MachineIdentificationUnique {
+                    machine_identification: fake_machine_id,
+                    serial: 1,
+                };
+
+                let role = if name == "EL1008" {
+                    0
+                } else if name == "EL2008" {
+                    1
+                } else if name == "EL2522" {
+                    2
+                } else {
+                    // EK1100 or others - use index + 100 to ensure uniqueness
+                    100 + (i as u16)
+                };
+
+                id_opt = Some(
+                    machines::machine_identification::DeviceMachineIdentification {
+                        machine_identification_unique: fake_unique,
+                        role: role,
+                    },
+                );
+            }
+            // END BYPASS
+
+            (i, id_opt)
         })
         .map(
             |(subdevice_index, device_machine_identification)| DeviceIdentification {

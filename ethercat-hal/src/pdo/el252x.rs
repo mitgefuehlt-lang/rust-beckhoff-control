@@ -111,7 +111,7 @@ impl RxPdoObject for PtoControl {
         buffer.set(9, self.frequency_select);
         buffer.set(15, self.control_toggle);
 
-        buffer[16..16 + 16].store_le(self.frequency_value);
+        buffer[16..16 + 16].store_le(self.frequency_value as i16);
     }
 }
 

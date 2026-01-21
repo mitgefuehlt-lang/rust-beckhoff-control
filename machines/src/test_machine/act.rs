@@ -24,7 +24,7 @@ impl MachineAct for TestMachine {
                         self.motor_running = !self.motor_running;
                         if self.motor_running {
                             self.motor_target_mm = 500.0; // Large target for continuous feel
-                            self.motor_speed_mm_s = 2.0;  // Very slow (2mm/s = 40 pulses/s)
+                            self.motor_speed_mm_s = 2.0; // Very slow (2mm/s = 40 pulses/s)
                         } else {
                             self.motor_speed_mm_s = 0.0; // Stop
                         }
@@ -63,7 +63,8 @@ impl MachineAct for TestMachine {
                 || current_output.frequency_value != motor_frequency_pdo
                 || current_output.go_counter != self.motor_running
                 || set_counter_trigger
-                || current_output.set_counter // Ensure we clear the sticky bit if it was set
+                || current_output.set_counter
+            // Ensure we clear the sticky bit if it was set
             {
                 pto.set_output(
                     EL2522Port::PTO2,

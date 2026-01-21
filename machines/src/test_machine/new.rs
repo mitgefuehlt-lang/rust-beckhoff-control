@@ -3,21 +3,20 @@ use crate::test_machine::api::TestMachineNamespace;
 use smol::block_on;
 use std::time::Instant;
 
-
 use crate::{
-    MachineNewHardware, MachineNewParams, MachineNewTrait, get_ethercat_device,
-    validate_no_role_dublicates, validate_same_machine_identification_unique,
+    get_ethercat_device, validate_no_role_dublicates, validate_same_machine_identification_unique,
+    MachineNewHardware, MachineNewParams, MachineNewTrait,
 };
 
 use anyhow::Error;
-use ethercat_hal::devices::el2522::{
-    EL2522, EL2522Configuration, EL2522_IDENTITY_A, EL2522OperatingMode,
-};
-use ethercat_hal::devices::el2008::{EL2008, EL2008_IDENTITY_A, EL2008_IDENTITY_B, EL2008Port};
-use ethercat_hal::devices::el1008::{EL1008, EL1008_IDENTITY_A, EL1008Port};
-use ethercat_hal::io::digital_output::DigitalOutput;
-use ethercat_hal::io::digital_input::DigitalInput;
 use ethercat_hal::coe::ConfigurableDevice;
+use ethercat_hal::devices::el1008::{EL1008, EL1008Port, EL1008_IDENTITY_A};
+use ethercat_hal::devices::el2008::{EL2008, EL2008Port, EL2008_IDENTITY_A, EL2008_IDENTITY_B};
+use ethercat_hal::devices::el2522::{
+    EL2522OperatingMode, EL2522Configuration, EL2522, EL2522_IDENTITY_A,
+};
+use ethercat_hal::io::digital_input::DigitalInput;
+use ethercat_hal::io::digital_output::DigitalOutput;
 use tracing::info;
 
 //Imports For Wago
@@ -55,8 +54,10 @@ impl MachineNewTrait for TestMachine {
 
         block_on(async {
             info!("[TestMachine::new] Acquiring EL1008 (Role 0)...");
-            let el1008_res = get_ethercat_device::<EL1008>(hardware, params, 0, [EL1008_IDENTITY_A].to_vec()).await;
-            
+            let el1008_res =
+                get_ethercat_device::<EL1008>(hardware, params, 0, [EL1008_IDENTITY_A].to_vec())
+                    .await;
+
             let el1008 = match el1008_res {
                 Ok(dev) => {
                     info!("[TestMachine::new] Successfully acquired EL1008");
@@ -79,8 +80,14 @@ impl MachineNewTrait for TestMachine {
 
             info!("[TestMachine::new] Acquiring EL2008 (Role 1)...");
             // Allow Identity A and B
-            let el2008_res = get_ethercat_device::<EL2008>(hardware, params, 1, [EL2008_IDENTITY_A, EL2008_IDENTITY_B].to_vec()).await;
-            
+            let el2008_res = get_ethercat_device::<EL2008>(
+                hardware,
+                params,
+                1,
+                [EL2008_IDENTITY_A, EL2008_IDENTITY_B].to_vec(),
+            )
+            .await;
+
             let el2008 = match el2008_res {
                 Ok(dev) => {
                     info!("[TestMachine::new] Successfully acquired EL2008");
@@ -102,8 +109,10 @@ impl MachineNewTrait for TestMachine {
             let do8 = DigitalOutput::new(el2008.clone(), EL2008Port::DO8);
 
             info!("[TestMachine::new] Acquiring EL2522 (Role 2)...");
-            let el2522_res = get_ethercat_device::<EL2522>(hardware, params, 2, [EL2522_IDENTITY_A].to_vec()).await;
-            
+            let el2522_res =
+                get_ethercat_device::<EL2522>(hardware, params, 2, [EL2522_IDENTITY_A].to_vec())
+                    .await;
+
             let (el2522, subdevice) = match el2522_res {
                 Ok(dev) => {
                     info!("[TestMachine::new] Successfully acquired EL2522");

@@ -76,7 +76,10 @@ impl MachineApi for TestMachine {
         match mutation {
             Mutation::SetLed { index, on } => self.set_led(index, on),
             Mutation::SetAllLeds { on } => self.set_all_leds(on),
-            Mutation::MoveMotor { target_mm, speed_mm_s } => {
+            Mutation::MoveMotor {
+                target_mm,
+                speed_mm_s,
+            } => {
                 self.motor_target_mm = target_mm;
                 self.motor_speed_mm_s = speed_mm_s;
             }

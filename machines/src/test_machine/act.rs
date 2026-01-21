@@ -32,8 +32,6 @@ impl MachineAct for TestMachine {
                     self.last_button_state = val;
                 }
             }
-                }
-            }
         }
 
         // --- Motor Control Logic (Runs every cycle) ---

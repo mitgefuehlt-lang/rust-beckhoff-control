@@ -6,6 +6,7 @@ import {
 } from "./types";
 
 export const VENDOR_QITECH = 0x0001;
+export const VENDOR_KAILAR = 0x0002;
 
 export type VendorProperties = {
   id: number;
@@ -15,6 +16,10 @@ export type VendorProperties = {
 export const vendorProperties: VendorProperties[] = [
   {
     id: VENDOR_QITECH,
+    name: "Qitech",
+  },
+  {
+    id: VENDOR_KAILAR,
     name: "Kailar",
   },
 ];
@@ -533,6 +538,57 @@ export const ip20TestMachine: MachineProperties = {
   ],
 };
 
+export const schneidemaschineV1: MachineProperties = {
+  name: "Schneidemaschine",
+  version: "V1",
+  slug: "schneidemaschine_v1",
+  icon: "lu:Scissors",
+  machine_identification: {
+    vendor: VENDOR_KAILAR,
+    machine: 0x0040,
+  },
+  device_roles: [
+    {
+      role: 0,
+      role_label: "EL1008 Digital Input",
+      allowed_devices: [
+        {
+          vendor_id: 2,
+          product_id: 0x3f03052,
+          revision: 0x120000,
+        },
+      ],
+    },
+    {
+      role: 1,
+      role_label: "EL2008 Digital Output",
+      allowed_devices: [
+        {
+          vendor_id: 2,
+          product_id: 0x7d83052,
+          revision: 0x110000,
+        },
+        {
+          vendor_id: 2,
+          product_id: 0x7d83052,
+          revision: 0x120000,
+        },
+      ],
+    },
+    {
+      role: 2,
+      role_label: "EL2522 Pulse Train Output",
+      allowed_devices: [
+        {
+          vendor_id: 2,
+          product_id: 0x9da3052,
+          revision: 0x120000,
+        },
+      ],
+    },
+  ],
+};
+
 export const machineProperties: MachineProperties[] = [
   winder2,
   extruder3,
@@ -545,6 +601,7 @@ export const machineProperties: MachineProperties[] = [
   testmachine,
   analogInputTestMachine,
   ip20TestMachine,
+  schneidemaschineV1,
 ];
 
 export const getMachineProperties = (

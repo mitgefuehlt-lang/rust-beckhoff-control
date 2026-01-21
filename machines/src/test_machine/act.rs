@@ -38,7 +38,11 @@ impl MachineAct for TestMachine {
         {
             // Speed: 10.0 mm/s -> 200 pulses/s (at 20 steps/mm)
             // Resolution: 0.01 Hz -> a value of 20000 in PDO = 200.00 Hz
-            let motor_speed_mm_s = if self.motor_running { self.motor_speed_mm_s } else { 0.0 };
+            let motor_speed_mm_s = if self.motor_running {
+                self.motor_speed_mm_s
+            } else {
+                0.0
+            };
             let motor_target_pulses = (self.motor_target_mm * 20.0) as u32;
             let motor_frequency_pdo = (motor_speed_mm_s * 20.0 * 100.0) as i32;
 

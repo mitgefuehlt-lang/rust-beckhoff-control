@@ -302,17 +302,17 @@ pub async fn setup_loop(
                 if needs_bypass {
                     let name = subdevice.name();
                     tracing::warn!(
-                        "Device {} has no/zero ID, applying BYPASS for TestMachine",
+                        "Device {} has no/zero ID, applying BYPASS for SchneideMaschineV1",
                         name
                     );
 
-                    // Default Fake ID for TestMachine
+                    // Default Fake ID for SchneideMaschineV1
                     let fake_unique =
                         machines::machine_identification::MachineIdentificationUnique {
                             machine_identification:
                                 machines::machine_identification::MachineIdentification {
-                                    vendor: 0x0001,  // VENDOR_QITECH
-                                    machine: 0x0033, // TEST_MACHINE
+                                    vendor: 0x0002,  // VENDOR_KAILAR
+                                    machine: 0x0040, // MACHINE_SCHNEIDEMASCHINE_V1
                                 },
                             serial: 1,
                         };

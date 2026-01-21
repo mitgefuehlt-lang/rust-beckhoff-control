@@ -11,6 +11,9 @@ pub mod api;
 pub mod new;
 use crate::test_machine::api::TestMachineNamespace;
 use crate::{TEST_MACHINE, VENDOR_QITECH};
+use ethercat_hal::devices::el2522::EL2522;
+use smol::lock::RwLock;
+use std::sync::Arc;
 
 #[derive(Debug)]
 pub struct TestMachine {
@@ -28,6 +31,12 @@ pub struct TestMachine {
     pub last_input_state: bool,
     pub blink_timer: Instant,
     pub blink_state: bool,
+    // Motor Control
+    pub pto: Arc<RwLock<EL2522>>,
+    pub motor_target_mm: f64,
+    pub motor_speed_mm_s: f64,
+    pub motor_running: bool,
+    pub last_button_state: bool,
 }
 
 impl Machine for TestMachine {

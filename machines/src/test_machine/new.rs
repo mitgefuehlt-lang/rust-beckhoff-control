@@ -10,10 +10,14 @@ use crate::{
 };
 
 use anyhow::Error;
+use ethercat_hal::devices::el2522::{
+    EL2522, EL2522Configuration, EL2522IDENTITY_A, EL2522OperatingMode,
+};
 use ethercat_hal::devices::el2008::{EL2008, EL2008_IDENTITY_A, EL2008_IDENTITY_B, EL2008Port};
 use ethercat_hal::devices::el1008::{EL1008, EL1008_IDENTITY_A, EL1008Port};
 use ethercat_hal::io::digital_output::DigitalOutput;
 use ethercat_hal::io::digital_input::DigitalInput;
+use ethercat_hal::coe::ConfigurableDevice;
 use tracing::info;
 
 //Imports For Wago
@@ -97,6 +101,31 @@ impl MachineNewTrait for TestMachine {
             let do7 = DigitalOutput::new(el2008.clone(), EL2008Port::DO7);
             let do8 = DigitalOutput::new(el2008.clone(), EL2008Port::DO8);
 
+            info!("[TestMachine::new] Acquiring EL2522 (Role 2)...");
+            let el2522_res = get_ethercat_device::<EL2522>(hardware, params, 2, [EL2522_IDENTITY_A].to_vec()).await;
+            
+            let el2522 = match el2522_res {
+                Ok(dev) => {
+                    info!("[TestMachine::new] Successfully acquired EL2522");
+                    dev.0
+                },
+                Err(e) => {
+                    tracing::error!("[TestMachine::new] Failed to acquire EL2522: {:?}", e);
+                    return Err(e);
+                }
+            };
+
+            // Configure EL2522 for Pulse-Direction on Channel 2
+            let el2522_config = EL2522Configuration {
+                channel2_configuration: ethercat_hal::devices::el2522::EL2522ChannelConfiguration {
+                    operating_mode: EL2522OperatingMode::PulseDirectionSpecification,
+                    ..Default::default()
+                },
+                ..Default::default()
+            };
+
+            el2522.write().await.write_config(&subdevice, &el2522_config).await?;
+
             info!("[TestMachine::new] Initialization complete. Creating instance.");
 
             let (sender, receiver) = smol::channel::unbounded();
@@ -116,6 +145,11 @@ impl MachineNewTrait for TestMachine {
                 last_input_state: false,
                 blink_timer: Instant::now(),
                 blink_state: false,
+                pto: el2522,
+                motor_target_mm: 0.0,
+                motor_speed_mm_s: 0.0,
+                motor_running: false,
+                last_button_state: false,
             };
             my_test.emit_state();
             Ok(my_test)

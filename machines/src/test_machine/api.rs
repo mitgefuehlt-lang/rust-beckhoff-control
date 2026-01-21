@@ -30,6 +30,7 @@ pub enum TestMachineEvents {
 pub enum Mutation {
     SetLed { index: usize, on: bool },
     SetAllLeds { on: bool },
+    MoveMotor { target_mm: f64, speed_mm_s: f64 },
 }
 
 #[derive(Debug, Clone)]
@@ -69,6 +70,10 @@ impl MachineApi for TestMachine {
         match mutation {
             Mutation::SetLed { index, on } => self.set_led(index, on),
             Mutation::SetAllLeds { on } => self.set_all_leds(on),
+            Mutation::MoveMotor { target_mm, speed_mm_s } => {
+                self.motor_target_mm = target_mm;
+                self.motor_speed_mm_s = speed_mm_s;
+            }
         }
 
         for (led, &on) in self.douts.iter().zip(self.led_on.iter()) {

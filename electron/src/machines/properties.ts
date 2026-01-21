@@ -15,7 +15,7 @@ export type VendorProperties = {
 export const vendorProperties: VendorProperties[] = [
   {
     id: VENDOR_QITECH,
-    name: "QiTech Industries GmbH",
+    name: "Kailar",
   },
 ];
 
@@ -429,7 +429,7 @@ export const aquapath1: MachineProperties = {
 };
 
 export const testmachine: MachineProperties = {
-  name: "TestMachine",
+  name: "Schneidemaschine V1",
   version: "V1",
   slug: "testmachine",
   icon: "lu:Disc3",

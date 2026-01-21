@@ -8,12 +8,11 @@ use crate::{
     MachineNewHardware, MachineNewParams, MachineNewTrait,
 };
 
-use anyhow::Error;
 use ethercat_hal::coe::ConfigurableDevice;
-use ethercat_hal::devices::el1008::{EL1008, EL1008Port, EL1008_IDENTITY_A};
-use ethercat_hal::devices::el2008::{EL2008, EL2008Port, EL2008_IDENTITY_A, EL2008_IDENTITY_B};
+use ethercat_hal::devices::el1008::{EL1008, EL1008_IDENTITY_A, EL1008Port};
+use ethercat_hal::devices::el2008::{EL2008, EL2008_IDENTITY_A, EL2008_IDENTITY_B, EL2008Port};
 use ethercat_hal::devices::el2522::{
-    EL2522OperatingMode, EL2522Configuration, EL2522, EL2522_IDENTITY_A,
+    EL2522, EL2522_IDENTITY_A, EL2522Configuration, EL2522OperatingMode,
 };
 use ethercat_hal::io::digital_input::DigitalInput;
 use ethercat_hal::io::digital_output::DigitalOutput;

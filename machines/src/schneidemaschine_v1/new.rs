@@ -56,7 +56,10 @@ impl MachineNewTrait for SchneideMaschineV1 {
                     dev.0
                 }
                 Err(e) => {
-                    tracing::error!("[SchneideMaschineV1::new] Failed to acquire EL1008: {:?}", e);
+                    tracing::error!(
+                        "[SchneideMaschineV1::new] Failed to acquire EL1008: {:?}",
+                        e
+                    );
                     return Err(e);
                 }
             };
@@ -86,7 +89,10 @@ impl MachineNewTrait for SchneideMaschineV1 {
                     dev.0
                 }
                 Err(e) => {
-                    tracing::error!("[SchneideMaschineV1::new] Failed to acquire EL2008: {:?}", e);
+                    tracing::error!(
+                        "[SchneideMaschineV1::new] Failed to acquire EL2008: {:?}",
+                        e
+                    );
                     return Err(e);
                 }
             };
@@ -111,7 +117,10 @@ impl MachineNewTrait for SchneideMaschineV1 {
                     (dev.0, dev.1)
                 }
                 Err(e) => {
-                    tracing::error!("[SchneideMaschineV1::new] Failed to acquire EL2522: {:?}", e);
+                    tracing::error!(
+                        "[SchneideMaschineV1::new] Failed to acquire EL2522: {:?}",
+                        e
+                    );
                     return Err(e);
                 }
             };

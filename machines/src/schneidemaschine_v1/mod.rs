@@ -1,5 +1,5 @@
 use crate::machine_identification::{MachineIdentification, MachineIdentificationUnique};
-use crate::schneidemaschine_v1::api::{StateEvent, SchneideMaschineV1Events};
+use crate::schneidemaschine_v1::api::{SchneideMaschineV1Events, StateEvent};
 use crate::{AsyncThreadMessage, Machine, MachineMessage};
 use control_core::socketio::namespace::NamespaceCacheingLogic;
 use ethercat_hal::io::digital_input::DigitalInput;

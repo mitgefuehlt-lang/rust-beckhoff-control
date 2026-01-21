@@ -46,17 +46,7 @@ impl MachineAct for TestMachine {
             let current_output = pto.get_output(EL2522Port::PTO2);
             let current_input = pto.get_input(EL2522Port::PTO2);
 
-            // Diagnostics (Slow down to once per second if needed, but here simple if motor_running)
-            if self.motor_running {
-                // We use a small hack to log only occasionally
-                if (now.as_secs_f64() * 2.0) as u64 % 2 == 0 {
-                   // tracing::info!("[TestMachine] PTO Status: error={} underflow={} overflow={} ramp={} freq_sel={} counter={}", 
-                   //     current_input.error, current_input.counter_underflow, current_input.counter_overflow, 
-                   //     current_input.ramp_active, current_input.frequency_select, current_input.counter_value);
-                }
-            }
-
-            // Pulse the set_counter bit only for ONE cycle on motor start
+            // Reset counter to 0 on motor start (rising edge of motor_running)
             let mut set_counter_trigger = false;
             if self.motor_running && !self.motor_was_running {
                 set_counter_trigger = true;

@@ -81,9 +81,17 @@ impl TxPdoObject for EncStatus {
 #[derive(Debug, Clone, Default, PdoObject)]
 #[pdo_object(bits = 32)]
 pub struct PtoControl {
-    pub frequency_select: bool,
-    pub disable_ramp: bool,
     pub go_counter: bool,
+    pub stop_counter: bool,
+    pub set_counter: bool,
+    pub reset_counter: bool,
+    pub select_end_counter: bool,
+    pub input_z_logic: bool,
+    pub reset: bool,
+    pub input_t_logic: bool,
+    pub disable_ramp: bool,
+    pub frequency_select: bool,
+    pub control_toggle: bool,
 
     /// Pulse frequency value in Hz (actually 0.01 Hz units)
     pub frequency_value: i32,
@@ -91,9 +99,17 @@ pub struct PtoControl {
 
 impl RxPdoObject for PtoControl {
     fn write(&self, buffer: &mut BitSlice<u8, Lsb0>) {
-        buffer.set(0, self.frequency_select);
-        buffer.set(1, self.disable_ramp);
-        buffer.set(2, self.go_counter);
+        buffer.set(0, self.go_counter);
+        buffer.set(1, self.stop_counter);
+        buffer.set(2, self.set_counter);
+        buffer.set(3, self.reset_counter);
+        buffer.set(4, self.select_end_counter);
+        buffer.set(5, self.input_z_logic);
+        buffer.set(6, self.reset);
+        buffer.set(7, self.input_t_logic);
+        buffer.set(8, self.disable_ramp);
+        buffer.set(9, self.frequency_select);
+        buffer.set(15, self.control_toggle);
 
         buffer[16..16 + 16].store_le(self.frequency_value);
     }

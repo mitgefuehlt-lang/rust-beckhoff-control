@@ -77,7 +77,7 @@ impl MachineAct for TestMachine {
                         reset_counter: false,
                         reset: false,
                         select_end_counter: false,
-                        control_toggle: (now.duration_since(self.last_state_emit).as_micros() / 100000) % 2 == 0, // Toggle every 100ms
+                        control_toggle: (now.duration_since(self.start_time).as_micros() / 100000) % 2 == 0, // Toggle every 100ms
                         set_counter: set_counter_trigger,
                         set_counter_value: 0,
                     },

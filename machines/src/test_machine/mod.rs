@@ -38,6 +38,7 @@ pub struct TestMachine {
     pub motor_running: bool,
     pub motor_was_running: bool,
     pub last_button_state: bool,
+    pub start_time: Instant,
 }
 
 impl Machine for TestMachine {

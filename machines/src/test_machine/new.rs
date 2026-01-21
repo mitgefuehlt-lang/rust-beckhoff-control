@@ -151,6 +151,7 @@ impl MachineNewTrait for TestMachine {
                 motor_running: false,
                 motor_was_running: false,
                 last_button_state: false,
+                start_time: Instant::now(),
             };
             my_test.emit_state();
             Ok(my_test)

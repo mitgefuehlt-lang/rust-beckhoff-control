@@ -4,8 +4,8 @@ use smol::block_on;
 use std::time::Instant;
 
 use crate::{
-    get_ethercat_device, validate_no_role_dublicates, validate_same_machine_identification_unique,
-    MachineNewHardware, MachineNewParams, MachineNewTrait,
+    MachineNewHardware, MachineNewParams, MachineNewTrait, get_ethercat_device,
+    validate_no_role_dublicates, validate_same_machine_identification_unique,
 };
 
 use ethercat_hal::coe::ConfigurableDevice;
@@ -57,11 +57,10 @@ impl MachineNewTrait for TestMachine {
                 get_ethercat_device::<EL1008>(hardware, params, 0, [EL1008_IDENTITY_A].to_vec())
                     .await;
 
-            let el1008 = match el1008_res {
                 Ok(dev) => {
                     info!("[TestMachine::new] Successfully acquired EL1008");
                     dev.0
-                },
+                }
                 Err(e) => {
                     tracing::error!("[TestMachine::new] Failed to acquire EL1008: {:?}", e);
                     return Err(e);
@@ -87,11 +86,10 @@ impl MachineNewTrait for TestMachine {
             )
             .await;
 
-            let el2008 = match el2008_res {
                 Ok(dev) => {
                     info!("[TestMachine::new] Successfully acquired EL2008");
                     dev.0
-                },
+                }
                 Err(e) => {
                     tracing::error!("[TestMachine::new] Failed to acquire EL2008: {:?}", e);
                     return Err(e);
@@ -112,11 +110,10 @@ impl MachineNewTrait for TestMachine {
                 get_ethercat_device::<EL2522>(hardware, params, 2, [EL2522_IDENTITY_A].to_vec())
                     .await;
 
-            let (el2522, subdevice) = match el2522_res {
                 Ok(dev) => {
                     info!("[TestMachine::new] Successfully acquired EL2522");
                     (dev.0, dev.1)
-                },
+                }
                 Err(e) => {
                     tracing::error!("[TestMachine::new] Failed to acquire EL2522: {:?}", e);
                     return Err(e);
@@ -133,7 +130,11 @@ impl MachineNewTrait for TestMachine {
                 ..Default::default()
             };
 
-            el2522.write().await.write_config(&subdevice, &el2522_config).await?;
+            el2522
+                .write()
+                .await
+                .write_config(&subdevice, &el2522_config)
+                .await?;
 
             info!("[TestMachine::new] Initialization complete. Creating instance.");
 

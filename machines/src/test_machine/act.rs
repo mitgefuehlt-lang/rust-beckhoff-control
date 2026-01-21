@@ -66,9 +66,10 @@ impl MachineAct for TestMachine {
         let mut pto = smol::block_on(self.pto.write());
         let current_output = pto.get_output(EL2522Port::PTO2);
 
-        // Only update if target or frequency changed to avoid unnecessary EtherCAT traffic
+        // Only update if target, frequency or go_counter state changed
         if current_output.target_counter_value != target_pulses
             || current_output.frequency_value != frequency_hz
+            || current_output.go_counter != self.motor_running
         {
             pto.set_output(
                 EL2522Port::PTO2,
@@ -76,6 +77,7 @@ impl MachineAct for TestMachine {
                     frequency_value: frequency_hz,
                     target_counter_value: target_pulses,
                     disble_ramp: false, // Enable ramping for smoother movement
+                    frequency_select: true, // Tell the EL2522 to use our frequency!
                     go_counter: self.motor_running, // Use motor_running to trigger movement
                     ..current_output
                 },

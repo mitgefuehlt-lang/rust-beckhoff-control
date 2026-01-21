@@ -96,6 +96,7 @@ pub struct PulseTrainOutputInput {
 #[derive(Debug, Clone)]
 pub struct PulseTrainOutputOutput {
     pub disble_ramp: bool,
+    pub frequency_select: bool,
     pub go_counter: bool,
     pub frequency_value: i32,
     pub target_counter_value: u32,

@@ -1,5 +1,6 @@
 use crate::{MachineChannel, MachineWithChannel};
 use anyhow::Result;
+use control_core::modbus::tcp::ModbusTcpDevice;
 use control_core::socketio::{
     event::{BuildEvent, GenericEvent},
     namespace::{
@@ -9,7 +10,11 @@ use control_core::socketio::{
 };
 use control_core_derive::BuildEvent;
 use serde::*;
+use smol::lock::Mutex;
+use std::net::SocketAddr;
 use std::time::{Duration, Instant};
+use units::electric_current::milliampere;
+use units::electric_potential::{millivolt, volt};
 use units::*;
 
 const MODBUS_DC_OFF: u16 = 0;

@@ -80,6 +80,7 @@ impl PulseTrainOutputDevice<EL2522Port> for EL2522 {
 
         PulseTrainOutputOutput {
             disble_ramp: pto_control.disble_ramp,
+            go_counter: pto_control.go_counter,
             frequency_value: pto_control.frequency_value,
             target_counter_value: pto_target.target_counter_value,
             set_counter: enc_control.set_counter,

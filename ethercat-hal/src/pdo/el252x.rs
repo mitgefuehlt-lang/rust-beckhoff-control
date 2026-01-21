@@ -31,6 +31,7 @@ impl TxPdoObject for PtoStatus {
         self.input_t = bits[5];
         self.input_z = bits[6];
         self.error = bits[7];
+        // Bit 8..12 reserved
         self.sync_error = bits[13];
         self.txpdo_state = bits[14];
         self.txpdo_toggle = bits[15];
@@ -101,16 +102,17 @@ pub struct PtoControl {
 
 impl RxPdoObject for PtoControl {
     fn write(&self, buffer: &mut BitSlice<u8, Lsb0>) {
-        buffer.set(0, self.go_counter);
-        buffer.set(1, self.stop_counter);
-        buffer.set(2, self.set_counter);
-        buffer.set(3, self.reset_counter);
-        buffer.set(4, self.select_end_counter);
-        buffer.set(5, self.input_z_logic);
-        buffer.set(6, self.reset);
-        buffer.set(7, self.input_t_logic);
-        buffer.set(8, self.disable_ramp);
-        buffer.set(9, self.frequency_select);
+        buffer.set(0, self.frequency_select);
+        buffer.set(1, self.disable_ramp);
+        buffer.set(2, self.go_counter);
+        buffer.set(3, self.stop_counter);
+        buffer.set(4, self.set_counter);
+        buffer.set(5, self.reset_counter);
+        buffer.set(6, self.select_end_counter);
+        buffer.set(7, self.input_z_logic);
+        buffer.set(8, self.reset);
+        buffer.set(9, self.input_t_logic);
+        // Bit 10..14 reserved
         buffer.set(15, self.control_toggle);
 
         buffer[16..16 + 16].store_le(self.frequency_value);

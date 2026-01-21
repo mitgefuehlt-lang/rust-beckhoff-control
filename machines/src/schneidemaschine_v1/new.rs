@@ -9,12 +9,12 @@ use crate::{
 };
 
 use anyhow::Error;
-use ethercat_hal::coe::ConfigurableDevice;
+// ConfigurableDevice temporarily unused - EL2522 config disabled
+// use ethercat_hal::coe::ConfigurableDevice;
 use ethercat_hal::devices::el1008::{EL1008, EL1008_IDENTITY_A, EL1008Port};
 use ethercat_hal::devices::el2008::{EL2008, EL2008_IDENTITY_A, EL2008_IDENTITY_B, EL2008Port};
-use ethercat_hal::devices::el2522::{
-    EL2522, EL2522_IDENTITY_A, EL2522Configuration, EL2522OperatingMode,
-};
+// EL2522Configuration and EL2522OperatingMode temporarily unused
+use ethercat_hal::devices::el2522::{EL2522, EL2522_IDENTITY_A};
 use ethercat_hal::io::digital_input::DigitalInput;
 use ethercat_hal::io::digital_output::DigitalOutput;
 use tracing::info;
@@ -111,7 +111,7 @@ impl MachineNewTrait for SchneideMaschineV1 {
                 get_ethercat_device::<EL2522>(hardware, params, 2, [EL2522_IDENTITY_A].to_vec())
                     .await;
 
-            let (el2522, subdevice) = match el2522_res {
+            let (el2522, _subdevice) = match el2522_res {
                 Ok(dev) => {
                     info!("[SchneideMaschineV1::new] Successfully acquired EL2522");
                     (dev.0, dev.1)
@@ -125,21 +125,24 @@ impl MachineNewTrait for SchneideMaschineV1 {
                 }
             };
 
-            // Configure EL2522 for Pulse-Direction on Channel 2
-            let el2522_config = EL2522Configuration {
-                channel2_configuration: ethercat_hal::devices::el2522::EL2522ChannelConfiguration {
-                    operating_mode: EL2522OperatingMode::PulseDirectionSpecification,
-                    travel_distance_control: true, // CRITICAL: Enable for Go counter to work
-                    ..Default::default()
-                },
-                ..Default::default()
-            };
-
-            el2522
-                .write()
-                .await
-                .write_config(&subdevice, &el2522_config)
-                .await?;
+            // TODO: EL2522 configuration temporarily disabled due to SDO parameter incompatibility
+            // The error 0x06040043 occurs at TxPDO mapping (0x1A06) during Safe-OP transition
+            // This needs to be fixed in ethercat-hal/src/devices/el2522.rs
+            //
+            // let el2522_config = EL2522Configuration {
+            //     channel2_configuration: ethercat_hal::devices::el2522::EL2522ChannelConfiguration {
+            //         operating_mode: EL2522OperatingMode::PulseDirectionSpecification,
+            //         travel_distance_control: true, // CRITICAL: Enable for Go counter to work
+            //         ..Default::default()
+            //     },
+            //     ..Default::default()
+            // };
+            //
+            // el2522
+            //     .write()
+            //     .await
+            //     .write_config(&subdevice, &el2522_config)
+            //     .await?;
 
             info!("[SchneideMaschineV1::new] Initialization complete. Creating instance.");
 

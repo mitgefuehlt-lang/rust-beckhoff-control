@@ -3,7 +3,7 @@ name: Fast Deploy (Binary Only)
 on:
   workflow_dispatch:
   push:
-    branches: [ main ]
+    branches: [ master ]
     paths:
       - 'server/**'
       - 'control-core/**'
